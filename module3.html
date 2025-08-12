@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סטטיסטי-כיפאק - מודול 3: אמידה ורווחי סמך</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUbKyJjd8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Assistant', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #111827;
+            color: #d1d5db;
+        }
+        .katex { font-size: 1.1em; }
+        .feedback {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 1rem;
+        }
+        .feedback.show {
+             max-height: 500px;
+             opacity: 1;
+             margin-top: 1rem;
+             padding: 0.75rem 1rem;
+        }
+        .feedback.correct {
+            border-right: 4px solid #22c55e;
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+        .feedback.incorrect {
+            border-right: 4px solid #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        .pro-tip {
+            background-color: rgba(250, 204, 21, 0.1);
+            border-right: 4px solid #facc15;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        .pro-tip::before {
+            content: "💡 טיפ של אלופים";
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #facc15;
+        }
+        .practice-question {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .spss-output {
+            background-color: #f0f4f8;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ccc;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            direction: ltr;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-purple-400">
+                <i class="fas fa-ruler-combined mr-2"></i>מודול 3: אמידה ורווחי סמך
+            </h1>
+            <a href="#" class="text-gray-300 hover:text-purple-400 transition">
+                <i class="fas fa-home ml-1"></i> חזרה לתפריט הראשי
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">מאומדן נקודתי לרשת ביטחון</h2>
+            <p class="text-lg text-gray-400">במודול זה נלמד כיצד לבנות טווחים סבירים (רווחי סמך) עבור הפרמטרים הלא ידועים באוכלוסייה.</p>
+        </section>
+
+        <!-- Section 3.1: Principles of Estimation -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">3.1: עקרונות האמידה</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">אומדן נקודתי (כמו `\bar{x}`) הוא הניחוש הטוב ביותר שלנו לערך באוכלוסייה, אבל כמעט בטוח שהוא לא מדויק. **רווח סמך** נותן לנו טווח של ערכים, יחד עם רמת ביטחון, שבו אנו מאמינים שהפרמטר האמיתי נמצא. חשבו על זה כמו לזרוק רשת דייגים (רווח הסמך) כדי "לתפוס" דג (הפרמטר).</p>
+                <div class="pro-tip">
+                    <strong>מרווח הטעות (`\epsilon`)</strong> הוא "חצי רוחב" הרשת שלנו. הוא קובע כמה רחוק מהאומדן הנקודתי שלנו אנחנו מוכנים ללכת. הנוסחה הכללית היא: `\text{רווח סמך} = \text{אומדן נקודתי} \pm \text{מרווח טעות}`.
+                </div>
+                 <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: הטרייד-אוף בין ביטחון לדיוק</h5>
+                    <p class="mb-4">שחקו עם הסליידר כדי לראות כיצד שינוי ברמת הסמך משפיע על רוחב רווח הסמך. שימו לב: ככל שאנחנו רוצים להיות בטוחים יותר, כך הרשת שלנו (הרווח) צריכה להיות רחבה יותר, והאמידה פחות מדויקת.</p>
+                    <div>
+                        <label for="confidence-slider" class="block mb-2">רמת סמך: <span id="confidence-value" class="font-bold">95%</span></label>
+                        <input id="confidence-slider" type="range" min="80" max="99" value="95" class="w-full">
+                    </div>
+                    <div class="mt-4 text-center">
+                        <div class="text-gray-400">אומדן נקודתי (`\bar{x}`)</div>
+                        <div class="h-8 w-1 bg-white mx-auto"></div>
+                        <div id="ci-visual" class="h-8 rounded-full mx-auto transition-all duration-300" style="background-color: rgba(192, 132, 252, 0.5); width: 50%;"></div>
+                        <div id="ci-width-label" class="text-sm text-gray-400 mt-2">רוחב: 50%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3.2: CI for Mean -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">3.2: רווח סמך לתוחלת (`\mu`)</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h4 class="text-2xl font-bold mb-4">מקרה א': שונות האוכלוסייה (`\sigma^2`) ידועה</h4>
+                <p class="mb-4">זהו המקרה הפשוט יותר, בו אנו משתמשים בהתפלגות Z. הנוסחה היא: `\bar{x} \pm Z_{\alpha/2} \frac{\sigma}{\sqrt{n}}`.</p>
+                
+                <h4 class="text-2xl font-bold mt-8 mb-4">מקרה ב': שונות האוכלוסייה (`\sigma^2`) לא ידועה</h4>
+                <p class="mb-4">זהו המצב הנפוץ במציאות. כיוון שאיננו יודעים את `\sigma`, אנו אומדים אותה מהמדגם (`\hat{S}`). חוסר הוודאות הנוסף הזה מחייב אותנו להשתמש בהתפלגות רחבה יותר מהתפלגות Z - **התפלגות t**. הנוסחה: `\bar{x} \pm t_{(\alpha/2, df)} \frac{\hat{S}}{\sqrt{n}}`, כאשר `df = n-1`.</p>
+
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: מחשבון רווח סמך לתוחלת</h5>
+                    <p class="mb-4">נסה את הדוגמה מהתרגול: מדגם של `n=25` ימים, `\bar{x}=18`, `\hat{S}=4.5`. בנה רווח סמך ברמת ביטחון של 95%.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div><label for="ci-mean-xbar">ממוצע מדגם (`\bar{x}`)</label><input id="ci-mean-xbar" type="number" value="18" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label for="ci-mean-s">סטיית תקן (`\hat{S}`)</label><input id="ci-mean-s" type="number" value="4.5" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label for="ci-mean-n">גודל מדגם (`n`)</label><input id="ci-mean-n" type="number" value="25" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label for="ci-mean-level">רמת סמך</label>
+                            <select id="ci-mean-level" class="w-full bg-gray-700 rounded p-2 mt-1">
+                                <option value="0.90">90%</option>
+                                <option value="0.95" selected>95%</option>
+                                <option value="0.99">99%</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="ci-mean-calc-btn" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition">חשב רווח סמך</button>
+                    <div id="feedback-ci-mean" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3.3: CI for Difference in Means -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">3.3: רווח סמך להפרש תוחלות (`\mu_1 - \mu_2`)</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4"> לעיתים קרובות, השאלה המעניינת היא לא מה הממוצע, אלא האם יש הבדל בין ממוצעים של שתי קבוצות. רווח סמך להפרש תוחלות עוזר לנו לענות על כך. אם ה-0 לא נמצא ברווח הסמך, זוהי אינדיקציה להבדל מובהק בין הקבוצות.</p>
+                <div class="pro-tip">
+                    כאשר בונים רווח סמך להפרש, אם כל הרווח חיובי, זה אומר ש-`\mu_1 > \mu_2`. אם כל הרווח שלילי, זה אומר ש-`\mu_2 > \mu_1`. אם הרווח כולל את 0, לא ניתן לשלול את האפשרות ש-`\mu_1 = \mu_2`.
+                </div>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                     <h5 class="font-bold mb-4 text-xl">פעילות: פירוש פלט SPSS להפרש תוחלות</h5>
+                     <p class="mb-2">להלן פלט של מבחן t למדגמים בלתי תלויים, המשווה ציונים בין שתי קבוצות.</p>
+                     <div class="spss-output text-sm">
+                        Independent Samples Test<br>
+                        --------------------------------------------------------------------------------------------------<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;95% Confidence Interval of the Difference<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;---------------------------------------<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mean&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Std. Error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lower&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Upper<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Difference&nbsp;&nbsp;Difference<br>
+                        --------------------------------------------------------------------------------------------------<br>
+                        Equal variances assumed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.420&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.850&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.785&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;9.055<br>
+                     </div>
+                     <p class="mt-4">בהתבסס על רווח הסמך בפלט, האם קיים הבדל מובהק בין שתי הקבוצות ברמת מובהקות של 5%?</p>
+                     <div id="spss-diff-buttons" class="flex flex-wrap gap-2 mt-4">
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" data-answer="yes">כן, קיים הבדל</button>
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" data-answer="no">לא, לא קיים הבדל</button>
+                    </div>
+                    <div id="feedback-spss-diff" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3.4: CI for Proportion -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">3.4: רווח סמך לפרופורציה (`p`)</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">כאשר המשתנה שלנו הוא דיכוטומי (כן/לא, תומך/לא תומך), אנחנו לא אומדים ממוצע אלא פרופורציה (אחוז). הנוסחה דומה במבנה שלה, אך משתמשת בטעות התקן של הפרופורציה: `\hat{p} \pm Z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}`.</p>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: מחשבון תוצאות סקר</h5>
+                     <p class="mb-4">במדגם של 200 איש, 75 הצהירו שיתמכו במועמד מסוים. בנה רווח סמך של 98% לפרופורציית התמיכה באוכלוסייה.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label for="ci-prop-x">מספר הצלחות (`x`)</label><input id="ci-prop-x" type="number" value="75" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label for="ci-prop-n">גודל מדגם (`n`)</label><input id="ci-prop-n" type="number" value="200" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label for="ci-prop-level">רמת סמך</label>
+                            <select id="ci-prop-level" class="w-full bg-gray-700 rounded p-2 mt-1">
+                                <option value="0.90">90%</option>
+                                <option value="0.95">95%</option>
+                                <option value="0.98" selected>98%</option>
+                                <option value="0.99">99%</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="ci-prop-calc-btn" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition">חשב רווח סמך</button>
+                    <div id="feedback-ci-prop" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3.5: Practice Questions -->
+        <section id="practice" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">3.5: תרגול מסכם</h3>
+            <div id="practice-questions-container">
+                 <p class="text-center text-gray-400">(שאלות תרגול יתווספו בקרוב)</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const renderAllMath = () => {
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '`', right: '`', display: false},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ]
+                    });
+                }
+            };
+            
+            const showFeedback = (elementId, message, isCorrect) => {
+                const feedbackEl = document.getElementById(elementId);
+                if (!feedbackEl) return;
+                feedbackEl.innerHTML = message;
+                feedbackEl.className = `p-3 rounded-lg feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+                renderAllMath();
+            };
+
+            const setupConfidenceSlider = () => {
+                const slider = document.getElementById('confidence-slider');
+                const valueLabel = document.getElementById('confidence-value');
+                const visual = document.getElementById('ci-visual');
+                const widthLabel = document.getElementById('ci-width-label');
+                
+                const updateVisual = () => {
+                    const value = slider.value;
+                    valueLabel.textContent = `${value}%`;
+                    const width = (value - 80) * (100 - 20) / (99 - 80) + 20; // Scale 80-99 to 20-100% width
+                    visual.style.width = `${width}%`;
+                    widthLabel.textContent = `רוחב: ${Math.round(width)}%`;
+                };
+                
+                slider.addEventListener('input', updateVisual);
+                updateVisual();
+            };
+
+            const setupCIMean = () => {
+                const tTable = {
+                    '0.05': { 15: 1.753, 24: 1.711, 29: 1.699, 1000: 1.645 },
+                    '0.025': { 15: 2.131, 24: 2.064, 29: 2.045, 1000: 1.96 },
+                    '0.005': { 15: 2.947, 24: 2.797, 29: 2.756, 1000: 2.576 }
+                };
+
+                const getTValue = (alpha, df) => {
+                    const alphaKey = (alpha/2).toString();
+                    if (df >= 30) return tTable[alphaKey][1000]; // Approx with Z
+                    if (df >= 25) return tTable[alphaKey][24];
+                    if (df >= 16) return tTable[alphaKey][24];
+                    return tTable[alphaKey][15]; // Fallback for small df
+                };
+
+                document.getElementById('ci-mean-calc-btn')?.addEventListener('click', () => {
+                    const xbar = parseFloat(document.getElementById('ci-mean-xbar').value);
+                    const s = parseFloat(document.getElementById('ci-mean-s').value);
+                    const n = parseInt(document.getElementById('ci-mean-n').value);
+                    const level = parseFloat(document.getElementById('ci-mean-level').value);
+
+                    if (isNaN(xbar) || isNaN(s) || isNaN(n) || n <= 1) {
+                        showFeedback('feedback-ci-mean', 'ערכים לא חוקיים.', false); return;
+                    }
+
+                    const alpha = 1 - level;
+                    const df = n - 1;
+                    const t_crit = getTValue(alpha, df);
+                    const se = s / Math.sqrt(n);
+                    const epsilon = t_crit * se;
+                    const lower = xbar - epsilon;
+                    const upper = xbar + epsilon;
+
+                    const message = `
+                        דרגות חופש: \`df = ${n} - 1 = ${df}\`.<br>
+                        ערך t קריטי למבחן דו-צדדי ברמת סמך ${level*100}% הוא \`t_crit \\approx ${t_crit}\`.<br>
+                        טעות התקן: \`SE = ${s} / \\sqrt{${n}} = ${se.toFixed(3)}\`.<br>
+                        מרווח הטעות: \`\\epsilon = ${t_crit} \\times ${se.toFixed(3)} = ${epsilon.toFixed(3)}\`.<br>
+                        <strong>רווח הסמך הוא: [${lower.toFixed(3)}, ${upper.toFixed(3)}]</strong>.
+                    `;
+                    showFeedback('feedback-ci-mean', message, true);
+                });
+            };
+
+            const setupCIProp = () => {
+                document.getElementById('ci-prop-calc-btn')?.addEventListener('click', () => {
+                    const x = parseInt(document.getElementById('ci-prop-x').value);
+                    const n = parseInt(document.getElementById('ci-prop-n').value);
+                    const level = parseFloat(document.getElementById('ci-prop-level').value);
+
+                    if (isNaN(x) || isNaN(n) || n <= 0 || x < 0 || x > n) {
+                        showFeedback('feedback-ci-prop', 'ערכים לא חוקיים.', false); return;
+                    }
+                    
+                    const p_hat = x / n;
+                    const critical_values = { '0.90': 1.645, '0.95': 1.96, '0.98': 2.33, '0.99': 2.576 };
+                    const z_crit = critical_values[level];
+
+                    const se = Math.sqrt((p_hat * (1 - p_hat)) / n);
+                    const epsilon = z_crit * se;
+                    const lower = p_hat - epsilon;
+                    const upper = p_hat + epsilon;
+
+                     const message = `
+                        פרופורציית המדגם: \`\\hat{p} = ${x} / ${n} = ${p_hat.toFixed(3)}\`.<br>
+                        ערך Z קריטי לרמת סמך ${level*100}% הוא \`Z_crit = ${z_crit}\`.<br>
+                        טעות התקן: \`SE = \\sqrt{(${p_hat.toFixed(3)} \\times ${ (1-p_hat).toFixed(3)}) / ${n}} = ${se.toFixed(4)}\`.<br>
+                        מרווח הטעות: \`\\epsilon = ${z_crit} \\times ${se.toFixed(4)} = ${epsilon.toFixed(4)}\`.<br>
+                        <strong>רווח הסמך הוא: [${lower.toFixed(4)}, ${upper.toFixed(4)}]</strong>.
+                    `;
+                    showFeedback('feedback-ci-prop', message, true);
+                });
+            };
+
+            const setupSpssDiffQuiz = () => {
+                document.getElementById('spss-diff-buttons')?.addEventListener('click', e => {
+                    if (e.target.tagName !== 'BUTTON') return;
+                    const isCorrect = e.target.dataset.answer === 'yes';
+                    const message = isCorrect
+                        ? '<i class="fas fa-check-circle mr-2"></i>נכון מאוד! רווח הסמך [1.785, 9.055] מכיל רק ערכים חיוביים ואינו כולל את 0. משמעות הדבר היא שברמת ביטחון של 95%, ההפרש באוכלוסייה גדול מ-0, כלומר קיים הבדל מובהק.'
+                        : '<i class="fas fa-times-circle mr-2"></i>לא נכון. מכיוון שהערך 0 אינו כלול ברווח הסמך, אנו יכולים להסיק ברמת ביטחון של 95% שקיים הבדל מובהק בין תוחלות שתי הקבוצות.';
+                    showFeedback('feedback-spss-diff', message, isCorrect);
+                });
+            };
+            
+            // --- Call Initialization Functions ---
+            setupConfidenceSlider();
+            setupCIMean();
+            setupCIProp();
+            setupSpssDiffQuiz();
+            renderAllMath();
+        });
+    </script>
+</body>
+</html>

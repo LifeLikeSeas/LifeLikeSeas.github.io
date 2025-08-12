@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סטטיסטי-כיפאק - מודול 4: בדיקת השערות</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUbKyJjd8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Assistant', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #111827;
+            color: #d1d5db;
+        }
+        .katex { font-size: 1.1em; }
+        .feedback {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 1rem;
+        }
+        .feedback.show {
+             max-height: 500px;
+             opacity: 1;
+             margin-top: 1rem;
+             padding: 0.75rem 1rem;
+        }
+        .feedback.correct {
+            border-right: 4px solid #22c55e;
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+        .feedback.incorrect {
+            border-right: 4px solid #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        .pro-tip {
+            background-color: rgba(250, 204, 21, 0.1);
+            border-right: 4px solid #facc15;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        .pro-tip::before {
+            content: "💡 טיפ של אלופים";
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #facc15;
+        }
+        .practice-question {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .spss-output {
+            background-color: #f0f4f8;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ccc;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            direction: ltr;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-orange-400">
+                <i class="fas fa-balance-scale mr-2"></i>מודול 4: בדיקת השערות
+            </h1>
+            <a href="#" class="text-gray-300 hover:text-orange-400 transition">
+                <i class="fas fa-home ml-1"></i> חזרה לתפריט הראשי
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-rose-500">קבלת החלטות על סמך נתונים</h2>
+            <p class="text-lg text-gray-400">כאן נלמד את התהליך המדעי של בדיקת טענות באמצעות נתונים, מהיסודות הלוגיים ועד למבחנים הסטטיסטיים עצמם.</p>
+        </section>
+
+        <!-- Section 4.1: Logic and Fundamentals -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">4.1: יסודות ולוגיקה</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h4 class="text-2xl font-bold mb-4">השערת האפס (`H_0`) מול השערת המחקר (`H_1`)</h4>
+                <p class="mb-4">כל מבחן סטטיסטי מתחיל משתי השערות הפוכות. `H_0` (השערת האפס) מייצגת תמיד את המצב הקיים, ה"משעמם", שתמיד כולל שוויון. `H_1` (השערת המחקר) היא הטענה שאנחנו רוצים לבדוק, הטענה לשינוי או הבדל.</p>
+                
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: מנסח ההשערות</h5>
+                    <p class="mb-4">תרחיש: "מנהל מפעל טוען ששיטת ייצור חדשה מקצרת את זמן הייצור הממוצע, שעמד בעבר על 120 דקות."</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">`H_0: \mu` <select id="h0-op" class="bg-gray-700 rounded"><option value="=">=</option><option value=">=">≥</option><option value="<=">≤</option></select> `120`</div>
+                        <div class="flex items-center gap-2">`H_1: \mu` <select id="h1-op" class="bg-gray-700 rounded"><option value="!=">≠</option><option value="<">&lt;</option><option value=">">&gt;</option></select> `120`</div>
+                    </div>
+                    <button id="hypo-check-btn" class="mt-4 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded transition">בדוק השערות</button>
+                    <div id="feedback-hypo" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+
+                <h4 class="text-2xl font-bold mt-8 mb-4">טעויות ועוצמה</h4>
+                <p class="mb-4">תהליך קבלת ההחלטות שלנו אינו מושלם. תמיד קיים סיכוי לטעות:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                    <div class="bg-red-500/20 border-r-4 border-red-500 p-4 rounded">
+                        <h5 class="font-bold text-red-400">טעות מסוג I (`\alpha`)</h5>
+                        <p>דוחים את `H_0` למרות שהיא נכונה. (אזעקת שווא)</p>
+                    </div>
+                    <div class="bg-blue-500/20 border-r-4 border-blue-500 p-4 rounded">
+                        <h5 class="font-bold text-blue-400">טעות מסוג II (`\beta`)</h5>
+                        <p>לא דוחים את `H_0` למרות שהיא אינה נכונה. (פספוס)</p>
+                    </div>
+                </div>
+                <p class="mt-4">**עוצמת המבחן (`1-\beta`)** היא ההסתברות לזהות אפקט אמיתי - לדחות נכון את `H_0`. זו המטרה שלנו!</p>
+            </div>
+        </section>
+
+        <!-- Section 4.2: Parametric Tests -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">4.2: ארגז הכלים: מבחנים פרמטריים</h3>
+            
+            <!-- T-Test for One Sample -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h4 class="text-2xl font-bold mb-4">מבחן t למדגם יחיד</h4>
+                <p class="mb-4">בודק האם ממוצע המדגם (`\bar{x}`) שונה באופן מובהק מערך קבוע כלשהו (`\mu_0`). שימושי כשהשונות באוכלוסייה לא ידועה.</p>
+                <p class="font-mono bg-gray-900 p-2 rounded text-center">`t = \frac{\bar{x} - \mu_0}{\hat{S} / \sqrt{n}}` (דף נוסחאות, III.2)</p>
+                <div class="pro-tip">
+                    זכרו: `df = n-1`. את הערך הקריטי מוצאים מטבלת t לפי רמת המובהקות (`\alpha`) ודרגות החופש.
+                </div>
+            </div>
+
+            <!-- T-Test for Independent Samples -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h4 class="text-2xl font-bold mb-4">מבחן t למדגמים בלתי תלויים</h4>
+                <p class="mb-4">הכלי המרכזי להשוואת ממוצעים בין שתי קבוצות נפרדות (למשל, קבוצת ניסוי וקבוצת ביקורת). המבחן בודק אם ההפרש בין הממוצעים במדגם (`\bar{x}_1 - \bar{x}_2`) גדול מספיק כדי להסיק על הפרש אמיתי באוכלוסייה.</p>
+                <p class="font-mono bg-gray-900 p-2 rounded text-center">`t = \frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)_0}{\sqrt{\frac{\hat{S}_p^2}{n_1} + \frac{\hat{S}_p^2}{n_2}}}` (דף נוסחאות, III.4)</p>
+                <p class="mt-2">כאשר `\hat{S}_p^2` היא השונות המשוקללת המשותפת.</p>
+                <div class="pro-tip">
+                    לפני ביצוע המבחן, יש לבדוק את **הנחת שוויון השונויות** באמצעות מבחן F (Levene's Test ב-SPSS). תוצאת מבחן זה תקבע באיזו שורה בפלט נשתמש.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4.3: SPSS Interpretation -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">4.3: יישום ופירוש פלט SPSS</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">בסופו של דבר, המחשב עושה את החישובים. התפקיד שלנו הוא לדעת איזה מבחן להריץ וכיצד לפרש נכון את הפלט.</p>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: פענוח פלט T-Test</h5>
+                    <p class="mb-2">להלן פלט של מבחן t למדגם יחיד, הבודק האם ממוצע הציונים שונה מ-80.</p>
+                    <div class="spss-output text-sm">
+                        One-Sample Test<br>
+                        Test Value = 80<br>
+                        ================================================================<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;95% Confidence Interval...<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-------------------------<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;df&nbsp;&nbsp;&nbsp;Sig. (2-tailed)&nbsp;&nbsp;&nbsp;Mean Difference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lower&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Upper<br>
+                        ================================================================<br>
+                        Score&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.531&nbsp;&nbsp;&nbsp;24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.018&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.500&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.841&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8.159<br>
+                    </div>
+                    <p class="mt-4">בהינתן `\alpha = 0.05`, מהי המסקנה?</p>
+                    <div id="spss-conclusion-buttons" class="flex flex-wrap gap-2 mt-4">
+                        <button class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" data-answer="reject">דוחים את `H_0`</button>
+                        <button class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" data-answer="fail_to_reject">לא דוחים את `H_0`</button>
+                    </div>
+                    <div id="feedback-spss-conclusion" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4.4: Practice Questions -->
+        <section id="practice" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">4.4: תרגול מסכם</h3>
+            <div id="practice-questions-container"></div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const renderAllMath = () => {
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '`', right: '`', display: false},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ]
+                    });
+                }
+            };
+            
+            const showFeedback = (elementId, message, isCorrect) => {
+                const feedbackEl = document.getElementById(elementId);
+                if (!feedbackEl) return;
+                feedbackEl.innerHTML = message;
+                feedbackEl.className = `p-3 rounded-lg feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+                renderAllMath();
+            };
+
+            const setupHypothesisQuiz = () => {
+                document.getElementById('hypo-check-btn')?.addEventListener('click', () => {
+                    const h0 = document.getElementById('h0-op').value;
+                    const h1 = document.getElementById('h1-op').value;
+                    const isCorrect = (h0 === '>=') && h1 === '<';
+                    const message = isCorrect
+                        ? '<i class="fas fa-check-circle mr-2"></i>נכון מאוד! `H_0` מייצגת את המצב הקיים או ההפך מטענת החוקר (`\\mu \\ge 120`), ו-`H_1` מייצגת את טענת החוקר לקיצור הזמן (`\\mu < 120`).'
+                        : '<i class="fas fa-times-circle mr-2"></i>לא מדויק. טענת החוקר היא על קיצור זמן, לכן זו השערה חד-צדדית שמאלית (`H_1: \\mu < 120`). השערת האפס תמיד מכילה את השוויון ומשלימה אותה (`H_0: \\mu \\ge 120`).';
+                    showFeedback('feedback-hypo', message, isCorrect);
+                });
+            };
+
+            const setupSpssConclusionQuiz = () => {
+                document.getElementById('spss-conclusion-buttons')?.addEventListener('click', e => {
+                    if (e.target.tagName !== 'BUTTON') return;
+                    const isCorrect = e.target.dataset.answer === 'reject';
+                    const message = isCorrect
+                        ? '<i class="fas fa-check-circle mr-2"></i>נכון! ערך ה-p (`Sig. = .018`) קטן מרמת המובהקות שנקבעה (`\\alpha = 0.05`). לכן, אנו דוחים את השערת האפס ומסיקים שהממוצע שונה מ-80 באופן מובהק.'
+                        : '<i class="fas fa-times-circle mr-2"></i>לא נכון. כלל ההחלטה המרכזי הוא: אם ה-p-value (`Sig.`) נמוך מרמת המובהקות (`\\alpha`), דוחים את `H_0`. כאן, `0.018 < 0.05`, ולכן דוחים.';
+                    showFeedback('feedback-spss-conclusion', message, isCorrect);
+                });
+            };
+
+            const setupPracticeQuiz = () => {
+                const container = document.getElementById('practice-questions-container');
+                const questions = [
+                    {
+                        type: 'radio',
+                        question: "חוקר טוען כי תרופה חדשה מעלה את מנת המשכל הממוצעת, שעומדת על 100. הוא בודק את טענתו ברמת מובהקות `\\alpha=0.05`. כיצד ינסח את השערותיו?",
+                        options: [
+                            "`H_0: \\mu = 100`, `H_1: \\mu \\ne 100`",
+                            "`H_0: \\mu \\le 100`, `H_1: \\mu > 100`",
+                            "`H_0: \\mu \\ge 100`, `H_1: \\mu < 100`",
+                            "`H_0: \\bar{x} = 100`, `H_1: \\bar{x} > 100`"
+                        ],
+                        correct: 1,
+                        explanation: "הטענה היא על עלייה (`>`), לכן זהו מבחן חד-צדדי ימני. `H_1` מייצגת את טענת החוקר, ו-`H_0` משלימה אותה ותמיד כוללת את השוויון."
+                    },
+                    {
+                        type: 'radio',
+                        question: "במבחן סטטיסטי התקבל `p-value = 0.034`. אם החוקר קבע מראש `\\alpha = 0.01`, מה תהיה מסקנתו?",
+                        options: [
+                            "לדחות את `H_0`",
+                            "לקבל את `H_1`",
+                            "לא לדחות את `H_0`",
+                            "להגדיל את המדגם"
+                        ],
+                        correct: 2,
+                        explanation: "כלל ההחלטה הוא: אם `p-value < \\alpha`, דוחים את `H_0`. במקרה זה, `0.034 > 0.01`, ולכן אין לנו מספיק ראיות כדי לדחות את `H_0`."
+                    },
+                    {
+                        type: 'radio',
+                        question: "מהי המשמעות של טעות מסוג II (`\\beta`)?",
+                        options: [
+                            "הסיכוי להגיד שיש אפקט, כשבעצם אין.",
+                            "הסיכוי לפספס אפקט אמיתי שקיים באוכלוסייה.",
+                            "רמת המובהקות של המבחן.",
+                            "עוצמת המבחן."
+                        ],
+                        correct: 1,
+                        explanation: "טעות מסוג II היא הכישלון לדחות את `H_0` כאשר היא למעשה שגויה. במילים אחרות, אנחנו מפספסים תגלית אמיתית."
+                    },
+                    {
+                        type: 'radio',
+                        question: "חוקר רוצה להשוות את ממוצעי הציונים של שתי כיתות (`n_1=25, n_2=28`). השונויות באוכלוסייה אינן ידועות. באיזה מבחן עליו להשתמש?",
+                        options: [
+                            "מבחן Z למדגמים בלתי תלויים",
+                            "מבחן t למדגמים מזווגים",
+                            "מבחן t למדגמים בלתי תלויים",
+                            "מבחן F"
+                        ],
+                        correct: 2,
+                        explanation: "מדובר בשתי קבוצות נפרדות (בלתי תלויות), והשונויות אינן ידועות. זהו המקרה הקלאסי לשימוש במבחן t למדגמים בלתי תלויים (נוסחה III.4 בדף הנוסחאות)."
+                    },
+                    {
+                        type: 'text',
+                        question: "במבחן t למדגם יחיד עם `n=20`, התקבל `t=2.5`. בהנחה שמדובר במבחן דו-צדדי, האם התוצאה מובהקת ברמת `\\alpha=0.05`? (ענו 'כן' או 'לא'. היעזרו בטבלה: `t_{crit(0.025, 19)} = 2.093`)",
+                        correct: "כן",
+                        explanation: "ערך ה-t המחושב (`|2.5|`) גדול מהערך הקריטי מהטבלה (2.093). לכן, התוצאה נופלת באזור הדחייה, והיא מובהקת."
+                    },
+                    {
+                        type: 'radio',
+                        question: "מה בודק מבחן `\\chi^2` לשונות?",
+                        options: [
+                            "האם שתי שונויות שונות זו מזו.",
+                            "האם שונות המדגם שונה באופן מובהק מערך קבוע מסוים.",
+                            "האם ממוצע המדגם שונה מערך קבוע מסוים.",
+                            "האם יש קשר בין שני משתנים."
+                        ],
+                        correct: 1,
+                        explanation: "מבחן חי-בריבוע לשונות (נוסחה III.8 בדף הנוסחאות) בודק את ההשערה `H_0: \\sigma^2 = \\sigma_0^2`, כלומר, האם השונות באוכלוסייה שממנה נלקח המדגם שווה לערך מסוים שנקבע מראש."
+                    },
+                    {
+                        type: 'radio',
+                        question: "במבחן F להשוואת שתי שונויות, התקבל `F=2.5`. דרגות החופש הן `df_1=10, df_2=12`. הערך הקריטי מהטבלה עבור `\\alpha=0.05` הוא 2.75. מה המסקנה?",
+                        options: [
+                            "השונויות שונות באופן מובהק.",
+                            "לא ניתן לדחות את ההשערה שהשונויות שוות.",
+                            "השונות הראשונה גדולה מהשנייה באופן מובהק.",
+                            "צריך להשתמש במבחן t."
+                        ],
+                        correct: 1,
+                        explanation: "הערך המחושב (2.5) קטן מהערך הקריטי (2.75). לכן, לא דוחים את `H_0`. אין לנו מספיק ראיות לטעון שהשונויות שונות זו מזו."
+                    },
+                    {
+                        type: 'radio',
+                        question: "במדגם של 100 אנשים, 60% תמכו בחוק חדש. מהו סטטיסטי המבחן לבדיקת ההשערה ששיעור התמיכה באוכלוסייה (`p`) גבוה מ-50%? (השתמש בנוסחה III.6)",
+                        options: [
+                            "`Z=1.5`",
+                            "`Z=2.0`",
+                            "`Z=2.5`",
+                            "`t=2.0`"
+                        ],
+                        correct: 1,
+                        explanation: "הסטטיסטי הוא `Z = (\\hat{p} - p_0) / \\sqrt{p_0(1-p_0)/n} = (0.6 - 0.5) / \\sqrt{0.5*0.5/100} = 0.1 / 0.05 = 2.0`."
+                    },
+                    {
+                        type: 'radio',
+                        question: "חוקר בדק את השפעת קורס על ציוני 15 סטודנטים (לפני ואחרי). איזה מבחן מתאים לבדיקת יעילות הקורס אם לא ניתן להניח נורמליות?",
+                        options: [
+                            "מבחן t למדגמים בלתי תלויים",
+                            "מבחן t למדגמים מזווגים",
+                            "מבחן וילקוקסון למדגמים מזווגים",
+                            "מבחן חי-בריבוע"
+                        ],
+                        correct: 2,
+                        explanation: "מדובר במדידות חוזרות על אותם נבדקים, כלומר מדגמים מזווגים. מכיוון שלא ניתן להניח נורמליות, נשתמש בחלופה הא-פרמטרית, שהיא מבחן וילקוקסון למדגמים מזווגים."
+                    },
+                    {
+                        type: 'radio',
+                        question: "הגדלת גודל המדגם (`n`), כאשר כל שאר הגורמים קבועים, תוביל בדרך כלל ל...",
+                        options: [
+                            "הגדלת הסיכוי לטעות מסוג II (`\\beta`)",
+                            "הקטנת עוצמת המבחן (`1-\\beta`)",
+                            "הגדלת עוצמת המבחן (`1-\\beta`)",
+                            "אין השפעה על עוצמת המבחן"
+                        ],
+                        correct: 2,
+                        explanation: "מדגם גדול יותר מספק אומדן מדויק יותר של הפרמטר, מה שמקל על זיהוי הבדלים אמיתיים. לכן, הגדלת המדגם מגדילה את עוצמת המבחן ומקטינה את הסיכוי לטעות מסוג II."
+                    }
+                ];
+
+                questions.forEach((q, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'practice-question';
+                    let optionsHtml = '';
+                    if (q.type === 'radio') {
+                        let radioButtonsHtml = '';
+                        q.options.forEach((opt, i) => {
+                            const optionId = `q${index}_opt${i}`;
+                            const radioInput = `<input type="radio" id="${optionId}" name="q${index}" value="${i}">`;
+                            const label = `<label for="${optionId}" class="ml-2">${opt}</label>`;
+                            radioButtonsHtml += `<div>${radioInput}${label}</div>`;
+                        });
+                        optionsHtml = `<div class="space-y-2 mt-4">${radioButtonsHtml}</div>`;
+                    } else {
+                        optionsHtml = `<input type="text" id="q${index}_input" class="mt-4 w-full bg-gray-700 rounded p-2" placeholder="הקלד את תשובתך כאן">`;
+                    }
+
+                    qDiv.innerHTML = `
+                        <p class="font-bold text-lg">שאלה ${index + 1}:</p>
+                        <p class="mt-2">${q.question}</p>
+                        ${optionsHtml}
+                        <button class="check-answer-btn mt-4 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" data-index="${index}">בדוק תשובה</button>
+                        <div id="feedback-q${index}" class="mt-4 p-3 rounded-lg feedback"></div>
+                    `;
+                    container.appendChild(qDiv);
+                });
+
+                document.querySelectorAll('.check-answer-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        const index = parseInt(e.target.dataset.index, 10);
+                        const q = questions[index];
+                        let isCorrect = false;
+                        if (q.type === 'radio') {
+                            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                            if (selected && parseInt(selected.value, 10) === q.correct) {
+                                isCorrect = true;
+                            }
+                        } else {
+                            const input = document.getElementById(`q${index}_input`);
+                            if (input.value.toLowerCase() === q.correct.toLowerCase()) {
+                                isCorrect = true;
+                            }
+                        }
+                        
+                        const message = isCorrect 
+                            ? `<i class="fas fa-check-circle mr-2"></i><strong>נכון!</strong><br>${q.explanation}`
+                            : `<i class="fas fa-times-circle mr-2"></i><strong>לא מדויק.</strong><br>${q.explanation}`;
+                        
+                        showFeedback(`feedback-q${index}`, message, isCorrect);
+                    });
+                });
+            };
+            
+            // --- Call Initialization Functions ---
+            setupHypothesisQuiz();
+            setupSpssConclusionQuiz();
+            setupPracticeQuiz();
+            renderAllMath();
+        });
+    </script>
+</body>
+</html>

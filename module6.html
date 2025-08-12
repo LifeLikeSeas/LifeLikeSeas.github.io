@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>מודול 6: הנווט הסטטיסטי המלא</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+
+body {
+    font-family: 'Assistant', sans-serif;
+    scroll-behavior: smooth;
+    background-color: #111827;
+    color: #d1d5db;
+    margin: 0;
+    padding: 1rem;
+}
+
+.katex { 
+    font-size: 1.1em; 
+}
+
+.feedback {
+    transition: all 0.3s ease-in-out;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0 1rem;
+}
+
+.feedback.show {
+     max-height: 1000px;
+     opacity: 1;
+     margin-top: 1rem;
+     padding: 0.75rem 1rem;
+}
+
+.feedback.correct {
+    border-right: 4px solid #22c55e;
+    background-color: rgba(34, 197, 94, 0.1);
+}
+
+.feedback.incorrect {
+    border-right: 4px solid #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.pro-tip {
+    background-color: rgba(250, 204, 21, 0.1);
+    border-right: 4px solid #facc15;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.pro-tip::before {
+    content: "💡 טיפ של אלופים";
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #facc15;
+}
+
+.practice-question {
+    background-color: #1f2937;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.spss-output {
+    background-color: #f0f4f8;
+    color: #333;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    direction: ltr;
+}
+
+.navigator-btn {
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.navigator-btn:focus {
+    outline: 2px solid #facc15;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    margin-top: 0;
+}
+
+h2, h3 {
+    font-weight: 700;
+}
+
+button {
+    border: none;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+.bg-indigo-600 {
+    background-color: #4f46e5;
+}
+
+.bg-indigo-700 {
+    background-color: #4338ca;
+}
+
+.bg-gray-600 {
+    background-color: #4b5563;
+}
+
+.bg-gray-700 {
+    background-color: #374151;
+}
+
+.bg-gray-800 {
+    background-color: #1f2937;
+}
+
+.bg-gray-900 {
+    background-color: #111827;
+}
+
+.text-white {
+    color: white;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.rounded {
+    border-radius: 0.5rem;
+}
+
+.p-4 {
+    padding: 1rem;
+}
+
+.p-5 {
+    padding: 1.25rem;
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+    margin-bottom: 0.75rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.mt-3 {
+    margin-top: 0.75rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mt-6 {
+    margin-top: 1.5rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.text-3xl {
+    font-size: 1.875rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.space-y-2 > * + * {
+    margin-top: 0.5rem;
+}
+
+.max-w-3xl {
+    max-width: 48rem;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.my-8 {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.text-right {
+    text-align: right;
+}
+
+</style>
+</head>
+<body>
+
+<main>
+
+<h1 class="text-3xl font-bold mb-6 text-center">מודול 6: בחירת המבחן הנכון - הנווט הסטטיסטי</h1>
+
+<section class="bg-gray-800 rounded-lg p-6 mb-6 max-w-3xl mx-auto">
+  <h2 class="text-2xl font-bold mb-4">מטרת המודול</h2>
+  <p>מודול זה נועד לחבר את כל הידע הסטטיסטי שנלמד בקורס, ולהקנות כלים מעשיים לקבלת החלטה מושכלת בבחירת המבחן הסטטיסטי המתאים לכל מצב.</p>
+  <ul class="mt-4 list-disc list-inside space-y-2">
+    <li>לזהות את סוג המדגם והמשתנים שלכם.</li>
+    <li>לקבוע את סולם המדידה של הנתונים.</li>
+    <li>לבדוק אם מתקיימות ההנחות הפרמטריות.</li>
+    <li>לבחור את המבחן הסטטיסטי הנכון בעזרת "הנווט הסטטיסטי".</li>
+    <li>לפרש פלטים של SPSS בצורה מהירה ומדויקת.</li>
+  </ul>
+</section>
+
+<section class="bg-gray-800 rounded-lg p-6 mb-6 max-w-3xl mx-auto">
+  <h2 class="text-2xl font-bold mb-4">לב 1: הנווט הסטטיסטי – כלי אינטראקטיבי לקבלת החלטות</h2>
+  <p>הנווט הסטטיסטי הוא עץ החלטות פשוט ואינטואיטיבי. הוא שואל סדרת שאלות מנחות, ובסופן מציע את המבחן הסטטיסטי המתאים:</p>
+  <ul class="mt-4 list-disc list-inside space-y-2">
+    <li>כמה מדגמים יש לך? מדגם אחד, שני מדגמים בלתי תלויים או שני מדגמים מזווגים.</li>
+    <li>מה סולם המדידה של המשתנה התלוי? שמי, סדר, או רווח/מנה.</li>
+    <li>מהי מטרת המחקר? השוואת ממוצעים, השוואת פרופורציות, בדיקת קשר בין משתנים.</li>
+    <li>האם מתקיימות ההנחות הפרמטריות? (התפלגות נורמלית, שוויון שונויות).</li>
+  </ul>
+  <div class="pro-tip mt-4">
+    הנווט יעזור לך לחסוך זמן יקר בהחלטות סטטיסטיות ולהקטין טעויות בבחירת מבחנים.
+  </div>
+</section>
+
+<section id="stat-navigator" class="bg-gray-900 p-6 rounded-lg max-w-3xl mx-auto my-8">
+  <h2 class="text-3xl font-bold mb-6 text-center">הנווט הסטטיסטי המלא</h2>
+  <p class="mb-6">בחרו תשובות לשאלות הבאות כדי לקבל המלצה למבחן הסטטיסטי המתאים למחקר שלכם.</p>
+  
+  <div id="navigator-step1" class="mb-6">
+    <h3 class="text-xl font-semibold mb-3">1. כמה מדגמים יש במחקר?</h3>
+    <button class="navigator-btn mb-2 w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="1" data-answer="one">מדגם אחד</button>
+    <button class="navigator-btn mb-2 w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="1" data-answer="two_independent">שני מדגמים בלתי תלויים</button>
+    <button class="navigator-btn w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="1" data-answer="two_paired">שני מדגמים מזווגים</button>
+  </div>
+
+  <div id="navigator-step2" class="mb-6 hidden">
+    <h3 class="text-xl font-semibold mb-3">2. מה סולם המדידה של המשתנה התלוי?</h3>
+    <button class="navigator-btn mb-2 w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="2" data-answer="nominal">שמי (Nominal)</button>
+    <button class="navigator-btn mb-2 w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="2" data-answer="ordinal">סדר (Ordinal)</button>
+    <button class="navigator-btn w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="2" data-answer="interval_ratio">רווח/מנה (Interval/Ratio)</button>
+  </div>
+
+  <div id="navigator-step3" class="mb-6 hidden">
+    <h3 class="text-xl font-semibold mb-3">3. מה מטרת המחקר?</h3>
+    <button class="navigator-btn mb-2 w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="3" data-answer="compare_means">השוואת ממוצעים</button>
+    <button class="navigator-btn mb-2 w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="3" data-answer="compare_proportions">השוואת פרופורציות</button>
+    <button class="navigator-btn w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="3" data-answer="test_association">בדיקת קשר בין משתנים</button>
+  </div>
+
+  <div id="navigator-step4" class="mb-6 hidden">
+    <h3 class="text-xl font-semibold mb-3">4. האם מתקיימות ההנחות הפרמטריות?</h3>
+    <p class="mb-3 text-sm text-gray-300">למשתנים רציפים: התפלגות נורמלית ושוויון שונויות (למדגמים מרובים)</p>
+    <button class="navigator-btn mb-2 w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="4" data-answer="yes">כן, מתקיימות</button>
+    <button class="navigator-btn w-full text-right bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded" data-step="4" data-answer="no">לא, לא מתקיימות</button>
+  </div>
+
+  <div id="navigator-result" class="hidden mt-6 p-5 bg-indigo-600 text-white font-bold text-xl rounded-lg text-center" style="white-space: pre-line;"></div>
+  <button id="navigator-reset" class="hidden mt-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded transition">התחל מחדש</button>
+</section>
+
+<section class="bg-gray-800 rounded-lg p-6 mb-6 max-w-3xl mx-auto">
+  <h2 class="text-2xl font-bold mb-4">לב 2: מתרגום שאלה לבחירת מבחן</h2>
+  <p>בשלב זה נלמד את ההיגיון שמאחורי הנווט הסטטיסטי:</p>
+  <ul class="mt-4 list-disc list-inside space-y-2">
+    <li>זיהוי מספר וסוג המדגמים מתוך סיפור השאלה.</li>
+    <li>קביעת סולם המדידה של המשתנים.</li>
+    <li>תרגום שאלת המחקר להשערות סטטיסטיות (H₀ ו-H₁).</li>
+  </ul>
+</section>
+
+<section class="bg-gray-800 rounded-lg p-6 mb-6 max-w-3xl mx-auto">
+  <h2 class="text-2xl font-bold mb-4">לב 3: גלריית פלטי SPSS</h2>
+  <p>נלמד כיצד לפרש במהירות ובדיוק פלטי SPSS, עם דוגמאות והסברים ויזואליים:</p>
+  <div class="spss-output mb-4" tabindex="0">
+t-test results:
+
+Group 1 mean = 25.6  
+Group 2 mean = 27.1  
+t(48) = -1.23, p = 0.22  
+<span class="spss-highlight">p &gt; 0.05</span> - לא ניתן לדחות את השערת האפס.
+  </div>
+  <div class="spss-output mb-4" tabindex="0">
+χ² test results:
+
+χ²(1) = 4.35, p = 0.037  
+<span class="spss-highlight">p &lt; 0.05</span> - יש קשר מובהק בין המשתנים.
+  </div>
+</section>
+
+<section class="bg-gray-800 rounded-lg p-6 mb-6 max-w-3xl mx-auto">
+  <h2 class="text-2xl font-bold mb-4">לב 4: סימולציית מבחן 📝</h2>
+  <p>בתרגול זה תצטרכו לקרוא תרחיש מחקר, לבחור מבחן, לפרש פלט ולנסח מסקנה.</p>
+  <div class="practice-question">
+    <p><strong>תרחיש:</strong> פסיכולוגית בודקת אם תוכנית התערבות חדשה מקטינה את רמת החרדה הממוצעת. היא דוגמת 25 סטודנטים, מודדת את רמת החרדה שלהם (בסולם 1–100) לפני ואחרי התוכנית. הנתונים אינם מתפלגים נורמלית.</p>
+    <p><strong>שאלות:</strong></p>
+    <ol>
+      <li>מה סוג המדגם?</li>
+      <li>מהו המבחן המתאים ביותר?</li>
+      <li>נסחו השערות H₀ ו-H₁.</li>
+      <li>פרשו פלט SPSS (יוצג בדף).</li>
+      <li>כתבו מסקנה מילולית.</li>
+    </ol>
+  </div>
+  <div class="spss-output mt-4" tabindex="0" id="practice-spss-output">
+Wilcoxon Signed-Rank Test
+
+N = 25  
+Z = -2.57  
+p = 0.01  
+
+<span class="spss-highlight">p &lt; 0.05</span> - דחייה מובהקת של השערת האפס.  
+</div>
+</section>
+
+</main>
+
+<script>
+(() => {
+  const steps = [1,2,3,4];
+  let answers = {};
+
+  function showStep(step) {
+    steps.forEach(s => {
+      const el = document.getElementById(`navigator-step${s}`);
+      if(el) el.classList.toggle('hidden', s !== step);
+    });
+    document.getElementById('navigator-result').classList.add('hidden');
+    document.getElementById('navigator-reset').classList.add('hidden');
+  }
+
+  function resetNavigator() {
+    answers = {};
+    showStep(1);
+    document.getElementById('navigator-result').classList.add('hidden');
+    document.getElementById('navigator-reset').classList.add('hidden');
+  }
+
+  function determineTest() {
+    // Based on literature and common stats tests:
+    // Inputs: answers object with keys: step1, step2, step3, step4
+    // step1 = 'one' | 'two_independent' | 'two_paired'
+    // step2 = 'nominal' | 'ordinal' | 'interval_ratio'
+    // step3 = 'compare_means' | 'compare_proportions' | 'test_association'
+    // step4 = 'yes' | 'no' (parametric assumptions met)
+
+    const s1 = answers[1];
+    const s2 = answers[2];
+    const s3 = answers[3];
+    const s4 = answers[4];
+
+    let test = 'לא ניתן לקבוע מבחן מתאים עם הנתונים שנבחרו.';
+
+    // מבחנים סטטיסטיים נפוצים לפי שילובים:
+
+    // 1. מדגם אחד, סולם רווח/מנה, השוואת ממוצעים
+    if (s1 === 'one' && s2 === 'interval_ratio' && s3 === 'compare_means') {
+      if (s4 === 'yes') test = "מבחן t למדגם יחיד (One-sample t-test)";
+      else test = "מבחן וילקוקסון למדגם יחיד (Wilcoxon Signed-Rank Test)";
+    }
+    // 2. שני מדגמים בלתי תלויים, סולם רווח/מנה, השוואת ממוצעים
+    else if (s1 === 'two_independent' && s2 === 'interval_ratio' && s3 === 'compare_means') {
+      if (s4 === 'yes') test = "מבחן t לשני מדגמים בלתי תלויים (Independent samples t-test)";
+      else test = "מבחן מאן-ויטני (Mann-Whitney U Test)";
+    }
+    // 3. שני מדגמים מזווגים, סולם רווח/מנה, השוואת ממוצעים
+    else if (s1 === 'two_paired' && s2 === 'interval_ratio' && s3 === 'compare_means') {
+      if (s4 === 'yes') test = "מבחן t לזוגות תלויים (Paired samples t-test)";
+      else test = "מבחן וילקוקסון לזוגות תלויים (Wilcoxon Signed-Rank Test)";
+    }
+    // 4. השוואת פרופורציות, שני מדגמים
+    else if ((s1 === 'two_independent' || s1 === 'one') && s2 === 'nominal' && s3 === 'compare_proportions') {
+      test = "מבחן Khi רבוע (Chi-square test) או מבחן פישר במידת הצורך";
+    }
+    // 5. בדיקת קשר בין משתנים סומיים (ordinal)
+    else if ((s2 === 'ordinal' || s2 === 'nominal') && s3 === 'test_association') {
+      test = "מבחן Khi רבוע (Chi-square test) או קורלציית ספירמן (Spearman's rho) בהתאם לסוג המשתנים";
+    }
+    // 6. בדיקת קשר בין משתנים רציפים עם הנחות פרמטריות
+    else if (s2 === 'interval_ratio' && s3 === 'test_association') {
+      if (s4 === 'yes') test = "קורלציית פירסון (Pearson correlation)";
+      else test = "קורלציית ספירמן (Spearman's rho)";
+    }
+    return test;
+  }
+
+  // Event delegation for buttons
+  document.getElementById('stat-navigator').addEventListener('click', (e) => {
+    if (!e.target.classList.contains('navigator-btn')) return;
+    const step = Number(e.target.dataset.step);
+    const answer = e.target.dataset.answer;
+    if (!step || !answer) return;
+
+    answers[step] = answer;
+
+    if (step === 4) {
+      // Show result
+      const testName = determineTest();
+      const resultDiv = document.getElementById('navigator-result');
+      resultDiv.textContent = "מבחן מומלץ:\n" + testName;
+      resultDiv.classList.remove('hidden');
+      document.getElementById('navigator-reset').classList.remove('hidden');
+
+      // Hide last step buttons
+      document.getElementById(`navigator-step${step}`).classList.add('hidden');
+    } else {
+      // Show next step, hide current
+      showStep(step + 1);
+    }
+  });
+
+  document.getElementById('navigator-reset').addEventListener('click', () => {
+    resetNavigator();
+  });
+
+  // Initialize
+  resetNavigator();
+})();
+</script>
+
+</body>
+</html>

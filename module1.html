@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סטטיסטי-כיפאק - מודול 1: יסודות</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUbKyJjd8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Assistant', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #111827;
+            color: #d1d5db;
+        }
+        .katex { font-size: 1.1em; }
+        .feedback {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 1rem;
+        }
+        .feedback.show {
+             max-height: 500px;
+             opacity: 1;
+             margin-top: 1rem;
+             padding: 0.75rem 1rem;
+        }
+        .feedback.correct {
+            border-right: 4px solid #22c55e;
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+        .feedback.incorrect {
+            border-right: 4px solid #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        .draggable { cursor: grab; }
+        .drop-target { border: 2px dashed #4b5563; min-height: 60px; }
+        .drop-target.drag-over { background-color: #374151; border-color: #60a5fa; }
+        .pro-tip {
+            background-color: rgba(250, 204, 21, 0.1);
+            border-right: 4px solid #facc15;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        .pro-tip::before {
+            content: "💡 טיפ של אלופים";
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #facc15;
+        }
+        .quiz-option {
+            transition: background-color 0.2s;
+        }
+        .quiz-option.correct {
+            background-color: #22c55e !important;
+            color: white;
+        }
+        .quiz-option.incorrect {
+            background-color: #ef4444 !important;
+            color: white;
+        }
+        .practice-question {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .backface-hidden {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-blue-400">
+                <i class="fas fa-book-open mr-2"></i>מודול 1: יסודות הסטטיסטיקה
+            </h1>
+            <a href="#" class="text-gray-300 hover:text-blue-400 transition">
+                <i class="fas fa-home ml-1"></i> חזרה לתפריט הראשי
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-300">הנחת היסודות</h2>
+            <p class="text-lg text-gray-400">במודול זה נלמד את שפת הסטטיסטיקה, נבחין בין אוכלוסייה למדגם ונבין את סולמות המדידה השונים.</p>
+        </section>
+
+        <!-- Section 1: Population vs. Sample -->
+        <section id="population-vs-sample" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">1.1: אוכלוסייה מול מדגם</h3>
+            <div class="bg-gray-800 rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <p class="mb-4">בסטטיסטיקה, אנחנו כמעט תמיד רוצים ללמוד על קבוצה גדולה שנקראת **אוכלוסייה**. מכיוון שלרוב אי אפשר למדוד את כולם, אנחנו לוקחים קבוצה קטנה יותר שנקראת **מדגם**.</p>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-blue-400">פרמטר:</strong> מדד מספרי המתאר תכונה של ה**אוכלוסייה** (למשל, `\mu` - ממוצע האוכלוסייה). זהו ערך קבוע אך לרוב לא ידוע.</li>
+                        <li><strong class="text-teal-300">סטטיסטי:</strong> מדד מספרי המתאר תכונה של ה**מדגם** (למשל, `\bar{x}` - ממוצע המדגם). זהו ערך משתנה, התלוי במדגם הספציפי שלקחנו.</li>
+                    </ul>
+                    <div class="pro-tip">
+                        המטרה שלנו בסטטיסטיקה היסקית היא להשתמש ב**סטטיסטי** שחישבנו מהמדגם כדי להסיק מסקנות על ה**פרמטר** הלא ידוע באוכלוסייה.
+                    </div>
+                </div>
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h5 class="font-bold mb-4 text-center">פעילות: התאם בין המושג להגדרה</h5>
+                    <div class="flex justify-around mb-4">
+                        <div id="drag-param" class="draggable bg-blue-500/30 p-3 rounded-lg" draggable="true">פרמטר</div>
+                        <div id="drag-stat" class="draggable bg-teal-500/30 p-3 rounded-lg" draggable="true">סטטיסטי</div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="drop-target p-4 rounded-lg flex flex-col items-center" data-match="drag-param">
+                            <i class="fas fa-users text-2xl text-blue-400 mb-2"></i>
+                            <span class="font-semibold">מתאר את כלל האוכלוסייה</span>
+                        </div>
+                        <div class="drop-target p-4 rounded-lg flex flex-col items-center" data-match="drag-stat">
+                            <i class="fas fa-user-friends text-2xl text-teal-300 mb-2"></i>
+                            <span class="font-semibold">מחושב מתוך המדגם</span>
+                        </div>
+                    </div>
+                     <div id="feedback-pop-sample" class="mt-4 p-3 rounded-lg text-center feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Symbols -->
+        <section id="symbols" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">1.2: הכרת הסמלים</h3>
+            <p class="mb-4">הבנת הסמלים היא כמו ללמוד את ה-א'-ב' של הסטטיסטיקה. בואו נתרגל.</p>
+            <div class="bg-gray-800 rounded-lg p-6">
+                 <div class="bg-gray-900 p-4 rounded-lg">
+                    <h5 class="font-bold mb-4">פעילות: כרטיסיות בזק</h5>
+                    <div id="flashcard-container" class="relative w-full h-48">
+                        <div id="flashcard" class="absolute w-full h-full rounded-lg bg-blue-800 flex items-center justify-center text-3xl font-bold cursor-pointer" style="transition: transform 0.6s; transform-style: preserve-3d;">
+                            <div id="flashcard-front" class="absolute w-full h-full flex items-center justify-center backface-hidden p-4 text-center"></div>
+                            <div id="flashcard-back" class="absolute w-full h-full flex items-center justify-center backface-hidden p-4 text-center bg-teal-800" style="transform: rotateY(180deg);"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center mt-4">
+                        <button id="next-flashcard" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition">הבא <i class="fas fa-chevron-left mr-2"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Scales of Measurement -->
+        <section id="scales" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">1.3: סולמות מדידה</h3>
+            <p class="mb-4">זיהוי נכון של סולם המדידה הוא קריטי לבחירת המבחן הסטטיסטי הנכון בהמשך. לכל סולם יש תכונות שונות.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                <div class="bg-gray-800 p-4 rounded-lg"><h4 class="text-xl font-bold text-blue-400">שמי (Nominal)</h4><p class="text-sm">קטגוריות ללא סדר. רק שמות.</p><p class="mt-2 font-mono text-xs">דוגמה: צבע עיניים, מקום מגורים</p></div>
+                <div class="bg-gray-800 p-4 rounded-lg"><h4 class="text-xl font-bold text-teal-300">סדר (Ordinal)</h4><p class="text-sm">יש סדר ודירוג, אך הרווחים לא שווים.</p><p class="mt-2 font-mono text-xs">דוגמה: רמת שביעות רצון, דרגה צבאית</p></div>
+                <div class="bg-gray-800 p-4 rounded-lg"><h4 class="text-xl font-bold text-purple-400">רווח (Interval)</h4><p class="text-sm">סדר ורווחים שווים, אך 0 שרירותי.</p><p class="mt-2 font-mono text-xs">דוגמה: טמפרטורה (C°), ציון IQ</p></div>
+                <div class="bg-gray-800 p-4 rounded-lg"><h4 class="text-xl font-bold text-rose-400">מנה (Ratio)</h4><p class="text-sm">הכל כלול: סדר, רווחים שווים ו-0 מוחלט.</p><p class="mt-2 font-mono text-xs">דוגמה: גובה, משקל, זמן תגובה</p></div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 mt-6">
+                <h5 class="font-bold mb-4 text-xl">פעילות: בחן את עצמך</h5>
+                <div id="scales-quiz-container" class="bg-gray-900 p-4 rounded-lg"></div>
+            </div>
+        </section>
+        
+        <!-- Section 4: Logic of Inference and Assumptions -->
+        <section id="assumptions" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">1.4: לוגיקת ההסקה והנחות יסוד</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">כל מבחן סטטיסטי הוא כמו כלי עבודה. כדי להשתמש בו נכון, אנחנו צריכים לוודא שתנאי השטח (הנתונים שלנו) מתאימים לכלי. תנאים אלו נקראים **הנחות**. הפרת הנחות עלולה להוביל למסקנות שגויות.</p>
+                <h4 class="text-2xl font-bold mt-6 mb-3">הנחות מרכזיות שנפגוש בקורס:</h4>
+                <ul class="list-disc list-inside space-y-3">
+                    <li><b>דגימה מקרית (Random Sampling):</b> ההנחה החשובה ביותר! אנחנו מניחים שהמדגם שלנו נבחר באופן אקראי מהאוכלוסייה, מה שמאפשר לו לייצג אותה נאמנה.</li>
+                    <li><b>התפלגות נורמלית (Normality):</b> מבחנים פרמטריים רבים (כמו מבחן t) מניחים שהמשתנה הנבדק מתפלג נורמלית באוכלוסייה. הנחה זו קריטית במיוחד במדגמים קטנים (`n &lt; 30`).</li>
+                    <li><b>שוויון שונויות (Homogeneity of Variances):</b> כשמשווים בין שתי קבוצות או יותר (למשל, גברים ונשים), מבחנים מסוימים (כמו מבחן t למדגמים בלתי תלויים) מניחים שהשונות של המשתנה דומה בכל הקבוצות באוכלוסייה.</li>
+                </ul>
+                 <div class="pro-tip">
+                    במבחן, אם לא נאמר אחרת לגבי התפלגות האוכלוסייה, נהוג להניח נורמליות (במיוחד במדגמים קטנים) כדי להשתמש במבחנים החזקים יותר (כמו מבחן t). תמיד ציינו את ההנחות שאתם מניחים!
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Practice Questions -->
+        <section id="practice" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">1.5: תרגול מסכם - בחן את עצמך</h3>
+            <div id="practice-questions-container"></div>
+        </section>
+        
+        <!-- Section 6: Module Summary -->
+        <section id="summary">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">סיכום מודול 1</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <ul class="list-disc list-inside space-y-3">
+                    <li>הבחנו בין **אוכלוסייה** (הקבוצה שמעניינת אותנו) ל**מדגם** (תת-קבוצה מייצגת).</li>
+                    <li>הגדרנו **פרמטר** כמדד של אוכלוסייה (למשל `\mu`) ו**סטטיסטי** כמדד של מדגם (למשל `\bar{x}`).</li>
+                    <li>למדנו את הסמלים הבסיסיים שישמשו אותנו לאורך כל הקורס.</li>
+                    <li>סיווגנו משתנים לארבעה **סולמות מדידה**: שמי, סדר, רווח ומנה.</li>
+                    <li>הצגנו את **ההנחות המרכזיות** שעומדות בבסיס המבחנים הסטטיסטיים שנלמד.</li>
+                    <li>הבנו שהמטרה המרכזית שלנו היא להשתמש במידע מהמדגם כדי להסיק על האוכלוסייה!</li>
+                </ul>
+                <p class="mt-6 font-bold text-lg text-center text-teal-300">כל הכבוד! סיימת את מודול היסודות. אתה מוכן להתקדם לעולם ההתפלגויות במודול 2.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const renderAllMath = () => {
+                try {
+                    if (window.renderMathInElement) {
+                        renderMathInElement(document.body, {
+                            delimiters: [
+                                {left: '$$', right: '$$', display: true},
+                                {left: '`', right: '`', display: false},
+                                {left: '$', right: '$', display: false},
+                                {left: '\\(', right: '\\)', display: false},
+                                {left: '\\[', right: '\\]', display: true}
+                            ]
+                        });
+                    }
+                } catch (error) {
+                    console.error("KaTeX rendering error:", error);
+                }
+            };
+            
+            const showFeedback = (elementId, message, isCorrect) => {
+                const feedbackDiv = document.getElementById(elementId);
+                if (!feedbackDiv) return;
+                feedbackDiv.innerHTML = message;
+                feedbackDiv.className = `p-3 rounded-lg feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+                renderAllMath();
+            };
+            {}
+            const setupPopulationVsSample = () => {
+                const draggables = document.querySelectorAll('#population-vs-sample .draggable');
+                const dropTargets = document.querySelectorAll('#population-vs-sample .drop-target');
+                let draggedItem = null;
+
+                draggables.forEach(draggable => {
+                    draggable.addEventListener('dragstart', e => {
+                        draggedItem = e.target;
+                        setTimeout(() => { e.target.style.opacity = '0.5'; }, 0);
+                    });
+                    draggable.addEventListener('dragend', e => {
+                        draggedItem = null;
+                        setTimeout(() => { e.target.style.opacity = '1'; }, 0);
+                    });
+                });
+
+                dropTargets.forEach(target => {
+                    target.addEventListener('dragover', e => { e.preventDefault(); target.classList.add('drag-over'); });
+                    target.addEventListener('dragleave', () => target.classList.remove('drag-over'));
+                    target.addEventListener('drop', e => {
+                        e.preventDefault();
+                        target.classList.remove('drag-over');
+                        if (draggedItem && target.dataset.match === draggedItem.id) {
+                            target.appendChild(draggedItem);
+                            draggedItem.setAttribute('draggable', 'false');
+                            draggedItem.style.cursor = 'default';
+                            checkAllMatched();
+                        }
+                    });
+                });
+
+                const checkAllMatched = () => {
+                    const remaining = document.querySelector('#population-vs-sample .draggable');
+                    if (!remaining) {
+                        showFeedback('feedback-pop-sample', 'מעולה! הבנת את ההבדל המהותי בין פרמטר לסטטיסטי.', true);
+                    }
+                };
+            };
+
+            const setupFlashcards = () => {
+                const flashcards = [
+                    { front: '`\\mu`', back: 'תוחלת (ממוצע) אוכלוסייה' },
+                    { front: '`\\sigma`', back: 'סטיית תקן אוכלוסייה' },
+                    { front: '`\\sigma^2`', back: 'שונות אוכלוסייה' },
+                    { front: '`\\bar{x}`', back: 'ממוצע מדגם' },
+                    { front: '`\\hat{S}`', back: 'אומדן לסטיית תקן מהמדגם' },
+                    { front: '`\\hat{S}^2`', back: 'אומדן לשונות מהמדגם (חסר הטיה)' },
+                    { front: '`n`', back: 'גודל המדגם' },
+                    { front: '`p`', back: 'פרופורציה באוכלוסייה' },
+                    { front: '`\\hat{p}`', back: 'פרופורציה במדגם' },
+                    { front: '`\\alpha`', back: 'רמת מובהקות (הסיכוי לטעות מסוג I)' },
+                    { front: '`\\beta`', back: 'הסיכוי לטעות מסוג II' },
+                    { front: '`\\Sigma`', back: 'סכום' }
+                ];
+                let currentCardIndex = 0;
+                const card = document.getElementById('flashcard');
+                const front = document.getElementById('flashcard-front');
+                const back = document.getElementById('flashcard-back');
+                const nextBtn = document.getElementById('next-flashcard');
+
+                const showCard = (index) => {
+                    card.style.transform = '';
+                    front.innerHTML = flashcards[index].front;
+                    back.innerHTML = flashcards[index].back;
+                    renderAllMath();
+                };
+
+                card.addEventListener('click', () => {
+                    card.style.transform = card.style.transform === 'rotateY(180deg)' ? '' : 'rotateY(180deg)';
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+                    showCard(currentCardIndex);
+                });
+
+                showCard(0);
+            };
+
+            const setupScalesQuiz = () => {
+                const quizContainer = document.getElementById('scales-quiz-container');
+                const questions = [
+                    { q: "מספר תעודת זהות של סטודנט", a: "nominal", explanation: "מספר ת.ז. הוא רק תווית זיהוי, אין משמעות לסדר או לגודל." },
+                    { q: "טמפרטורת חדר במעלות פרנהייט", a: "interval", explanation: "יש סדר ורווחים שווים, אבל 0°F לא אומר 'אין חום כלל'." },
+                    { q: "מספר שיחות טלפון שבוצעו ביום", a: "ratio", explanation: "יש 0 מוחלט (אפס שיחות), וניתן לומר ש-10 שיחות זה פי 2 מ-5 שיחות." },
+                    { q: "דירוג סרטים (1 עד 5 כוכבים)", a: "ordinal", explanation: "5 כוכבים טוב יותר מ-4, אבל ההבדל בין 4 ל-5 לא בהכרח שווה להבדל בין 1 ל-2." }
+                ];
+                let currentQuestionIndex = 0;
+
+                const renderQuizQuestion = () => {
+                    const q = questions[currentQuestionIndex];
+                    quizContainer.innerHTML = `
+                        <p class="mb-4">איזה סולם מדידה מתאר את המשתנה: <strong>"${q.q}"</strong>?</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="quiz-option bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-answer="nominal">שמי</button>
+                            <button class="quiz-option bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded" data-answer="ordinal">סדר</button>
+                            <button class="quiz-option bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" data-answer="interval">רווח</button>
+                            <button class="quiz-option bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded" data-answer="ratio">מנה</button>
+                        </div>
+                        <div id="feedback-scales-quiz" class="mt-4 p-3 rounded-lg feedback"></div>
+                    `;
+                    quizContainer.querySelectorAll('.quiz-option').forEach(btn => {
+                        btn.addEventListener('click', handleQuizAnswer);
+                    });
+                };
+
+                const handleQuizAnswer = (e) => {
+                    const selectedAnswer = e.target.dataset.answer;
+                    const correctAnswer = questions[currentQuestionIndex].a;
+                    const explanation = questions[currentQuestionIndex].explanation;
+                    
+                    quizContainer.querySelectorAll('.quiz-option').forEach(btn => {
+                        btn.disabled = true;
+                        if (btn.dataset.answer === correctAnswer) {
+                            btn.classList.add('correct');
+                        }
+                    });
+
+                    if (selectedAnswer === correctAnswer) {
+                        showFeedback('feedback-scales-quiz', `<i class="fas fa-check-circle mr-2"></i>נכון מאוד! ${explanation}`, true);
+                    } else {
+                        e.target.classList.add('incorrect');
+                        showFeedback('feedback-scales-quiz', `<i class="fas fa-times-circle mr-2"></i>לא מדויק. התשובה הנכונה היא ${correctAnswer}. ${explanation}`, false);
+                    }
+                    
+                    setTimeout(() => {
+                        currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                        renderQuizQuestion();
+                    }, 4000);
+                };
+
+                renderQuizQuestion();
+            };
+            
+            const setupPracticeQuiz = () => {
+                const container = document.getElementById('practice-questions-container');
+                const questions = [
+                    {
+                        type: 'radio',
+                        question: "חוקר רצה לבדוק את ממוצע שעות השינה של סטודנטים בישראל. הוא דגם 200 סטודנטים מהאוניברסיטה הפתוחה ומצא שהם ישנים בממוצע 6.8 שעות בלילה. מהי ה**אוכלוסייה** במחקר זה?",
+                        options: [
+                            "200 הסטודנטים שנדגמו",
+                            "כל הסטודנטים באוניברסיטה הפתוחה",
+                            "כל הסטודנטים בישראל",
+                            "ממוצע שעות השינה (6.8)"
+                        ],
+                        correct: 2,
+                        explanation: "האוכלוסייה היא הקבוצה הכללית שהחוקר רוצה להסיק עליה מסקנות - במקרה זה, כלל הסטודנטים בישראל. 200 הסטודנטים הם המדגם."
+                    },
+                    {
+                        type: 'radio',
+                        question: "בהמשך לשאלה הקודמת, מהו ה**פרמטר** ומהו ה**סטטיסטי**?",
+                        options: [
+                            "פרמטר: 6.8 שעות; סטטיסטי: ממוצע שעות השינה של כלל הסטודנטים.",
+                            "פרמטר: ממוצע שעות השינה של כלל הסטודנטים; סטטיסטי: 6.8 שעות.",
+                            "פרמטר: 200 סטודנטים; סטטיסטי: כלל הסטודנטים בישראל.",
+                            "אין דרך לדעת מהו הפרמטר."
+                        ],
+                        correct: 1,
+                        explanation: "הפרמטר (`\\mu`) הוא המדד של האוכלוסייה (ממוצע שעות השינה של **כלל** הסטודנטים), והסטטיסטי (`\\bar{x}`) הוא המדד המחושב מהמדגם (6.8 שעות)."
+                    },
+                    {
+                        type: 'text',
+                        question: "אוכלוסייה קטנה כוללת ארבעה ציונים: 10, 8, 6, 4. מהי **שונות האוכלוסייה** (`\\sigma^2`)?",
+                        correct: 5,
+                        explanation: "שלב א: חישוב ממוצע האוכלוסייה: `\\mu = (10+8+6+4)/4 = 7`.<br>שלב ב: חישוב סכום ריבועי הסטיות מהממוצע: `(10-7)^2 + (8-7)^2 + (6-7)^2 + (4-7)^2 = 9 + 1 + 1 + 9 = 20`.<br>שלב ג: חלוקה בגודל האוכלוסייה: `\\sigma^2 = 20 / 4 = 5`."
+                    },
+                    {
+                        type: 'radio',
+                        question: "איזה מהמשתנים הבאים נמדד בסולם **מנה (Ratio)**?",
+                        options: [
+                            "מספר חולצה של שחקן כדורגל",
+                            "ציון בבחינה (0-100)",
+                            "טמפרטורה במעלות צלזיוס",
+                            "הכנסה חודשית בשקלים"
+                        ],
+                        correct: 3,
+                        explanation: "הכנסה חודשית היא בסולם מנה כי יש לה 0 מוחלט (אפס הכנסה), וניתן לומר שהכנסה של 10,000 שקלים היא פי 2 מהכנסה של 5,000."
+                    },
+                    {
+                        type: 'radio',
+                        question: "מהי ההנחה הבסיסית לגבי מדגם מקרי פשוט?",
+                        options: [
+                            "כל התצפיות במדגם זהות",
+                            "התצפיות תלויות זו בזו",
+                            "התצפיות בלתי תלויות ושוות התפלגות (i.i.d)",
+                            "המדגם חייב להיות גדול מ-30"
+                        ],
+                        correct: 2,
+                        explanation: "הנחת היסוד היא שהתצפיות הן i.i.d (Independent and Identically Distributed). כלומר, בחירת פרט אחד למדגם אינה משפיעה על בחירת פרט אחר, ולכל הפרטים באוכלוסייה יש אותה התפלגות."
+                    },
+                    {
+                        type: 'radio',
+                        question: "בפלט SPSS, מה מייצג הערך `Std. Error Mean`?",
+                        options: [
+                            "סטיית התקן של האוכלוסייה (`\\sigma`)",
+                            "אומדן לסטיית התקן מהמדגם (`\\hat{S}`)",
+                            "השונות של המדגם",
+                            "טעות התקן של הממוצע (`\\hat{S} / \\sqrt{n}`)"
+                        ],
+                        correct: 3,
+                        explanation: "טעות התקן של הממוצע היא מדד לפיזור של התפלגות הדגימה של הממוצע. היא שווה לאומדן סטיית התקן של המדגם חלקי שורש גודל המדגם, ומייצגת את הדיוק של ממוצע המדגם כאומדן לממוצע האוכלוסייה."
+                    }
+                ];
+
+                questions.forEach((q, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'practice-question';
+                    let optionsHtml = '';
+                    if (q.type === 'radio') {
+                        let radioButtonsHtml = '';
+                        q.options.forEach((opt, i) => {
+                            const optionId = `q${index}_opt${i}`;
+                            const radioInput = `<input type="radio" id="${optionId}" name="q${index}" value="${i}">`;
+                            const label = `<label for="${optionId}" class="ml-2">${opt}</label>`;
+                            radioButtonsHtml += `<div>${radioInput}${label}</div>`;
+                        });
+                        optionsHtml = `<div class="space-y-2 mt-4">${radioButtonsHtml}</div>`;
+                    } else {
+                        optionsHtml = `<input type="number" id="q${index}_input" class="mt-4 w-full bg-gray-700 rounded p-2" placeholder="הקלד את תשובתך כאן">`;
+                    }
+
+                    qDiv.innerHTML = `
+                        <p class="font-bold text-lg">שאלה ${index + 1}:</p>
+                        <p class="mt-2">${q.question}</p>
+                        ${optionsHtml}
+                        <button class="check-answer-btn mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-index="${index}">בדוק תשובה</button>
+                        <div id="feedback-q${index}" class="mt-4 p-3 rounded-lg feedback"></div>
+                    `;
+                    container.appendChild(qDiv);
+                });
+
+                document.querySelectorAll('.check-answer-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        const index = parseInt(e.target.dataset.index);
+                        const q = questions[index];
+                        let isCorrect = false;
+                        if (q.type === 'radio') {
+                            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                            if (selected && parseInt(selected.value) === q.correct) {
+                                isCorrect = true;
+                            }
+                        } else {
+                            const input = document.getElementById(`q${index}_input`);
+                            if (parseFloat(input.value) === q.correct) {
+                                isCorrect = true;
+                            }
+                        }
+                        
+                        const message = isCorrect 
+                            ? `<i class="fas fa-check-circle mr-2"></i><strong>נכון!</strong><br>${q.explanation}`
+                            : `<i class="fas fa-times-circle mr-2"></i><strong>לא מדויק.</strong><br>${q.explanation}`;
+                        
+                        showFeedback(`feedback-q${index}`, message, isCorrect);
+                    });
+                });
+            };
+            
+            // --- Call Initialization Functions ---
+            setupPopulationVsSample();
+            setupFlashcards();
+            setupScalesQuiz();
+            setupPracticeQuiz();
+            renderAllMath();
+        });
+    </script>
+</body>
+</html>

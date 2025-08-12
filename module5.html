@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סטטיסטי-כיפאק - מודול 5: מבחנים א-פרמטריים</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUbKyJjd8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Assistant', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #111827;
+            color: #d1d5db;
+        }
+        .katex { font-size: 1.1em; }
+        .feedback {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 1rem;
+        }
+        .feedback.show {
+             max-height: 500px;
+             opacity: 1;
+             margin-top: 1rem;
+             padding: 0.75rem 1rem;
+        }
+        .feedback.correct {
+            border-right: 4px solid #22c55e;
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+        .feedback.incorrect {
+            border-right: 4px solid #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        .pro-tip {
+            background-color: rgba(250, 204, 21, 0.1);
+            border-right: 4px solid #facc15;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        .pro-tip::before {
+            content: "💡 טיפ של אלופים";
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #facc15;
+        }
+        .practice-question {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .spss-output {
+            background-color: #f0f4f8;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ccc;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            direction: ltr;
+        }
+        .interactive-table input {
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 0.25rem;
+            text-align: center;
+            width: 60px;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-rose-400">
+                <i class="fas fa-not-equal mr-2"></i>מודול 5: מבחנים א-פרמטריים
+            </h1>
+            <a href="#" class="text-gray-300 hover:text-rose-400 transition">
+                <i class="fas fa-home ml-1"></i> חזרה לתפריט הראשי
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-rose-400 to-fuchsia-500">כשלא הכל נורמלי</h2>
+            <p class="text-lg text-gray-400">נכיר ארגז כלים סטטיסטי חדש למצבים שבהם הנחות המבחנים הקלאסיים לא מתקיימות.</p>
+        </section>
+
+        <!-- Section 5.1: Why Non-Parametric? -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">5.1: למה בכלל צריך מבחנים א-פרמטריים?</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">עד עכשיו, רוב המבחנים שלמדנו (כמו מבחן t) היו **פרמטריים**. הם הניחו הנחות חזקות לגבי האוכלוסייה, בעיקר שהנתונים מתפלגים נורמלית. אבל מה קורה כשההנחות האלה לא מתקיימות?</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>כשהמדגם שלנו **קטן מאוד** ואין לנו סיבה להניח נורמליות.</li>
+                    <li>כשהנתונים שלנו הם **אורדינליים** (סולם סדר), כלומר דירוגים שבהם אין משמעות לממוצע.</li>
+                    <li>כשהנתונים שלנו הם **שמיים** (קטגוריות), כמו העדפות או סוגים.</li>
+                </ul>
+                <p class="mt-4">במקרים אלו, נשתמש במבחנים **א-פרמטריים**. הם לא מסתמכים על פרמטרים של האוכלוסייה (כמו `μ` ו-`σ`), אלא עובדים על **שכיחויות** או **דירוגים**, ולכן הם "חופשיים מהנחות" (Distribution-Free).</p>
+            </div>
+        </section>
+
+        <!-- Section 5.2: Chi-Square Tests -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">5.2: משפחת מבחני חי-בריבוע (`χ²`)</h3>
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h4 class="text-2xl font-bold mb-4">מבחן `χ²` לטיב התאמה</h4>
+                <p class="mb-4">מבחן זה בודק אם התפלגות השכיחויות במדגם שלנו תואמת להתפלגות תיאורטית שאנו מצפים לה. `H_0` תמיד טוענת שההתפלגות תואמת לצפוי.</p>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: האם הקובייה הוגנת?</h5>
+                    <p class="mb-4">הטלנו קובייה 60 פעמים וקיבלנו את התוצאות הבאות. אם הקובייה הוגנת, היינו מצפים לקבל כל תוצאה 10 פעמים. האם התוצאות שלנו סוטות באופן מובהק מהצפוי?</p>
+                    <table class="w-full text-center interactive-table">
+                        <thead><tr><th>תוצאה</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+                        <tbody>
+                            <tr><td>שכיחות נצפית (O)</td>
+                                <td><input id="gof-o1" type="number" value="8"></td>
+                                <td><input id="gof-o2" type="number" value="12"></td>
+                                <td><input id="gof-o3" type="number" value="11"></td>
+                                <td><input id="gof-o4" type="number" value="9"></td>
+                                <td><input id="gof-o5" type="number" value="7"></td>
+                                <td><input id="gof-o6" type="number" value="13"></td>
+                            </tr>
+                             <tr><td>שכיחות צפויה (E)</td>
+                                <td><input id="gof-e1" type="number" value="10"></td>
+                                <td><input id="gof-e2" type="number" value="10"></td>
+                                <td><input id="gof-e3" type="number" value="10"></td>
+                                <td><input id="gof-e4" type="number" value="10"></td>
+                                <td><input id="gof-e5" type="number" value="10"></td>
+                                <td><input id="gof-e6" type="number" value="10"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button id="gof-calc-btn" class="mt-4 w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded transition">חשב `χ²`</button>
+                    <div id="feedback-gof" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h4 class="text-2xl font-bold mb-4">מבחן `χ²` לאי-תלות</h4>
+                <p class="mb-4">מבחן זה בודק האם קיים קשר סטטיסטי בין שני משתנים שמיים. `H_0` תמיד טוענת שאין קשר בין המשתנים (הם בלתי תלויים).</p>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: האם יש קשר בין מגדר להעדפת קפה?</h5>
+                    <p class="mb-4">בסקר נשאלו גברים ונשים אם הם מעדיפים קפה שחור או הפוך.</p>
+                    <table class="w-full text-center interactive-table">
+                         <thead><tr><th></th><th>קפה שחור</th><th>קפה הפוך</th></tr></thead>
+                         <tbody>
+                            <tr><td>גברים</td><td><input id="ind-a" type="number" value="30"></td><td><input id="ind-b" type="number" value="20"></td></tr>
+                            <tr><td>נשים</td><td><input id="ind-c" type="number" value="15"></td><td><input id="ind-d" type="number" value="35"></td></tr>
+                         </tbody>
+                    </table>
+                    <button id="ind-calc-btn" class="mt-4 w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded transition">חשב `χ²`</button>
+                    <div id="feedback-ind" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5.3: Rank-Based Tests -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">5.3: מבחנים מבוססי דירוג (חלופות למבחני t)</h3>
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h4 class="text-2xl font-bold mb-4">מבחן וילקוקסון למדגמים בלתי תלויים (Mann-Whitney U)</h4>
+                <p class="mb-4">זוהי החלופה הא-פרמטרית למבחן t למדגמים בלתי תלויים. משתמשים בו כדי להשוות שתי קבוצות נפרדות כשהנתונים הם דירוגים או כשהנחת הנורמליות מופרת.</p>
+                <div class="pro-tip">
+                    הרעיון המרכזי: אם אין הבדל בין הקבוצות, הדירוגים הגבוהים והנמוכים יתפזרו באופן שווה ביניהן. אם קבוצה אחת עדיפה, רוב הדירוגים הגבוהים יתרכזו בה.
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h4 class="text-2xl font-bold mb-4">מבחן וילקוקסון למדגמים מזווגים</h4>
+                <p class="mb-4">החלופה הא-פרמטרית למבחן t למדגמים מזווגים. משתמשים בו להשוואת שתי מדידות על אותם נבדקים (למשל, לפני ואחרי טיפול) כשהנחת הנורמליות של ההפרשים מופרת.</p>
+                 <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: אשף הדירוג</h5>
+                    <p>נבדקה דיאטה על 6 אנשים. להלן ההפרשים במשקל (לפני-אחרי): `+5, -2, +3, +3, 0, -8`</p>
+                    <p class="mt-2">דרגו את הערכים המוחלטים של ההפרשים (התעלמו מה-0) וחשבו את `W+` (סכום הדירוגים של ההפרשים החיוביים).</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <input id="wilcoxon-wplus" type="number" class="w-24 bg-gray-700 rounded p-1 text-center" placeholder="W+">
+                        <button id="wilcoxon-check-btn" class="bg-rose-600 hover:bg-rose-700 px-3 py-1 rounded">בדוק</button>
+                    </div>
+                    <div id="feedback-wilcoxon" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5.4: Practice Questions -->
+        <section id="practice" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">5.4: תרגול מסכם</h3>
+            <div id="practice-questions-container"></div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const renderAllMath = () => {
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '`', right: '`', display: false},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ]
+                    });
+                }
+            };
+            
+            const showFeedback = (elementId, message, isCorrect) => {
+                const feedbackEl = document.getElementById(elementId);
+                if (!feedbackEl) return;
+                feedbackEl.innerHTML = message;
+                feedbackEl.className = `p-3 rounded-lg feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+                renderAllMath();
+            };
+
+            const setupChiSquareGOF = () => {
+                document.getElementById('gof-calc-btn')?.addEventListener('click', () => {
+                    let chiSquare = 0;
+                    let df = -1;
+                    let explanation = 'חישוב תרומת כל תא לסטטיסטי: `\\sum \\frac{(O-E)^2}{E}`<br><ul>';
+                    for (let i = 1; i <= 6; i++) {
+                        const o = parseFloat(document.getElementById(`gof-o${i}`).value);
+                        const e = parseFloat(document.getElementById(`gof-e${i}`).value);
+                        if (isNaN(o) || isNaN(e) || e <= 0) {
+                            showFeedback('feedback-gof', 'ערכים לא חוקיים.', false);
+                            return;
+                        }
+                        const term = Math.pow(o - e, 2) / e;
+                        chiSquare += term;
+                        explanation += `<li>תא ${i}: \`\\frac{(${o} - ${e})^2}{${e}} = ${term.toFixed(3)}\`</li>`;
+                        if (e > 0) df++;
+                    }
+                    explanation += '</ul>';
+                    const critValue = 11.07; // for df=5, alpha=0.05
+                    const conclusion = chiSquare < critValue
+                        ? `לא דוחים את \`H_0\`. אין מספיק ראיות לטעון שהקובייה אינה הוגנת.`
+                        : `דוחים את \`H_0\`. יש ראיות לכך שהקובייה אינה הוגנת.`;
+
+                    const message = `${explanation}סה"כ: \`\\chi^2 = ${chiSquare.toFixed(3)}\`.<br>דרגות חופש: \`df = ${df}\`.<br>הערך הקריטי עבור \`\\alpha=0.05\` הוא \`\\chi^2_{crit} \\approx 11.07\`.<br><strong>מסקנה: ${conclusion}</strong>`;
+                    showFeedback('feedback-gof', message, true);
+                });
+            };
+
+            const setupChiSquareInd = () => {
+                document.getElementById('ind-calc-btn')?.addEventListener('click', () => {
+                    const a = parseFloat(document.getElementById('ind-a').value);
+                    const b = parseFloat(document.getElementById('ind-b').value);
+                    const c = parseFloat(document.getElementById('ind-c').value);
+                    const d = parseFloat(document.getElementById('ind-d').value);
+
+                    if (isNaN(a) || isNaN(b) || isNaN(c) || isNaN(d)) {
+                        showFeedback('feedback-ind', 'ערכים לא חוקיים.', false); return;
+                    }
+
+                    const row1 = a + b;
+                    const row2 = c + d;
+                    const col1 = a + c;
+                    const col2 = b + d;
+                    const total = a + b + c + d;
+
+                    const e_a = (row1 * col1) / total;
+                    const e_b = (row1 * col2) / total;
+                    const e_c = (row2 * col1) / total;
+                    const e_d = (row2 * col2) / total;
+
+                    const chiSquare = Math.pow(a - e_a, 2) / e_a + Math.pow(b - e_b, 2) / e_b + Math.pow(c - e_c, 2) / e_c + Math.pow(d - e_d, 2) / e_d;
+                    const df = 1;
+                    const critValue = 3.841; // for df=1, alpha=0.05
+                    const conclusion = chiSquare > critValue ? 'דוחים את `H_0` ומסיקים שיש קשר מובהק.' : 'לא דוחים את `H_0`. אין עדות לקשר.';
+                    
+                    const message = `
+                        השכיחויות הצפויות הן: E(גברים, שחור)=${e_a.toFixed(2)}, E(גברים, הפוך)=${e_b.toFixed(2)}, E(נשים, שחור)=${e_c.toFixed(2)}, E(נשים, הפוך)=${e_d.toFixed(2)}.<br>
+                        ערך הסטטיסטי: \`\\chi^2 = ${chiSquare.toFixed(3)}\`.<br>
+                        דרגות חופש: \`df = (2-1)(2-1) = 1\`.<br>
+                        הערך הקריטי עבור \`\\alpha=0.05\` הוא \`\\chi^2_{crit} \\approx 3.841\`.<br>
+                        <strong>מסקנה: ${conclusion}</strong>
+                    `;
+                    showFeedback('feedback-ind', message, true);
+                });
+            };
+            
+            const setupWilcoxonQuiz = () => {
+                 document.getElementById('wilcoxon-check-btn')?.addEventListener('click', () => {
+                    const wplus = parseInt(document.getElementById('wilcoxon-wplus').value);
+                    const explanation = `
+                        <p>ההפרשים (ללא 0) הם: \`+5, -2, +3, +3, -8\`</p>
+                        <p>הערכים המוחלטים: \`5, 2, 3, 3, 8\`</p>
+                        <p>הדירוגים (מהנמוך לגבוה):</p>
+                        <ul class="list-disc list-inside">
+                            <li>\`2\` מקבל דירוג 1</li>
+                            <li>שני ערכי \`3\` חולקים את דירוגים 2 ו-3, לכן כל אחד מקבל \`(2+3)/2 = 2.5\`</li>
+                            <li>\`5\` מקבל דירוג 4</li>
+                            <li>\`8\` מקבל דירוג 5</li>
+                        </ul>
+                        <p>ההפרשים החיוביים המקוריים היו \`+5\` (דירוג 4) ו-\`+3\` (דירוג 2.5) ו-\`+3\` (דירוג 2.5).<br>לכן, \`W+ = 4 + 2.5 + 2.5 = 9\`.</p>
+                    `;
+                     
+                     if (wplus === 9) {
+                         showFeedback('feedback-wilcoxon', `<i class="fas fa-check-circle mr-2"></i>כל הכבוד! החישוב מדויק.` + explanation, true);
+                     } else {
+                         showFeedback('feedback-wilcoxon', `<i class="fas fa-times-circle mr-2"></i>לא בדיוק. בוא נעבור על השלבים:` + explanation, false);
+                     }
+                });
+            };
+
+            const setupPracticeQuiz = () => {
+                const container = document.getElementById('practice-questions-container');
+                const questions = [
+                    // Chi-Square Questions
+                    {
+                        type: 'radio',
+                        question: "מתי נשתמש במבחן `\\chi^2` לטיב התאמה?",
+                        options: [
+                            "כדי להשוות ממוצעים בין שתי קבוצות.",
+                            "כדי לבדוק אם התפלגות שכיחויות במדגם תואמת להתפלגות צפויה.",
+                            "כדי לבדוק קשר בין שני משתנים רציפים.",
+                            "כדי להשוות שתי שונויות."
+                        ],
+                        correct: 1,
+                        explanation: "מבחן `\\chi^2` לטיב התאמה משווה בין ספירות נצפות (Observed) לספירות צפויות (Expected) על פני מספר קטגוריות של משתנה יחיד."
+                    },
+                    {
+                        type: 'text',
+                        question: "במבחן `\\chi^2` לאי-תלות, טבלת השכיחויות היא בגודל 3x4. מהן דרגות החופש (`df`)?",
+                        correct: 6,
+                        explanation: "דרגות החופש מחושבות לפי `(מספר שורות - 1) * (מספר עמודות - 1)`. במקרה זה, `(3-1) * (4-1) = 2 * 3 = 6`."
+                    },
+                    // Wilcoxon / Mann-Whitney U Questions
+                    {
+                        type: 'radio',
+                        question: "חוקר רוצה להשוות את רמת שביעות הרצון (בסולם 1-10) בין שתי קבוצות מטופלים (`n_1=12, n_2=14`). הנתונים אינם מתפלגים נורמלית. באיזה מבחן עליו להשתמש?",
+                        options: [
+                            "מבחן t למדגמים בלתי תלויים",
+                            "מבחן וילקוקסון למדגמים מזווגים",
+                            "מבחן Mann-Whitney U",
+                            "מבחן `\\chi^2` לאי-תלות"
+                        ],
+                        correct: 2,
+                        explanation: "מדובר בשתי קבוצות נפרדות (בלתי תלויות) עם נתונים אורדינליים (דירוג) והנחת הנורמליות מופרת. זהו המקרה הקלאסי למבחן Mann-Whitney U."
+                    },
+                    {
+                        type: 'radio',
+                        question: "מהו העיקרון המרכזי מאחורי מבחני וילקוקסון?",
+                        options: [
+                            "השוואת ממוצעים",
+                            "השוואת שונויות",
+                            "השוואת סכום הדירוגים בין קבוצות",
+                            "השוואת פרופורציות"
+                        ],
+                        correct: 2,
+                        explanation: "מבחנים אלו ממירים את הערכים המקוריים לדירוגים, ואז בודקים אם יש הבדל מובהק בסכום הדירוגים בין הקבוצות."
+                    },
+                    // Special Tests Questions
+                    {
+                        type: 'radio',
+                        question: "חוקר בדק 50 זוגות נשואים ושאל כל אחד האם הוא בעד או נגד חוק מסוים. הוא רוצה לבדוק אם יש הבדל בשיעור התמיכה בין גברים לנשים בתוך הזוגות. באיזה מבחן ישתמש?",
+                        options: [
+                            "מבחן `\\chi^2` לאי-תלות",
+                            "מבחן מקנמר",
+                            "מבחן הסימן",
+                            "מבחן t למדגמים מזווגים"
+                        ],
+                        correct: 1,
+                        explanation: "מדובר בנתונים מזווגים (בעל ואישה) ומשתנה דיכוטומי (בעד/נגד). מבחן מקנמר נועד בדיוק למצב זה, לבדוק שינוי או הבדל בפרופורציות במדגמים תלויים."
+                    }
+                ];
+
+                questions.forEach((q, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'practice-question';
+                    let optionsHtml = '';
+                    if (q.type === 'radio') {
+                        let radioButtonsHtml = '';
+                        q.options.forEach((opt, i) => {
+                            const optionId = `q${index}_opt${i}`;
+                            const radioInput = `<input type="radio" id="${optionId}" name="q${index}" value="${i}">`;
+                            const label = `<label for="${optionId}" class="ml-2">${opt}</label>`;
+                            radioButtonsHtml += `<div>${radioInput}${label}</div>`;
+                        });
+                        optionsHtml = `<div class="space-y-2 mt-4">${radioButtonsHtml}</div>`;
+                    } else {
+                        optionsHtml = `<input type="text" id="q${index}_input" class="mt-4 w-full bg-gray-700 rounded p-2" placeholder="הקלד את תשובתך כאן">`;
+                    }
+
+                    qDiv.innerHTML = `
+                        <p class="font-bold text-lg">שאלה ${index + 1}:</p>
+                        <p class="mt-2">${q.question}</p>
+                        ${optionsHtml}
+                        <button class="check-answer-btn mt-4 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded" data-index="${index}">בדוק תשובה</button>
+                        <div id="feedback-q${index}" class="mt-4 p-3 rounded-lg feedback"></div>
+                    `;
+                    container.appendChild(qDiv);
+                });
+
+                document.querySelectorAll('.check-answer-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        const index = parseInt(e.target.dataset.index, 10);
+                        const q = questions[index];
+                        let isCorrect = false;
+                        if (q.type === 'radio') {
+                            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                            if (selected && parseInt(selected.value, 10) === q.correct) {
+                                isCorrect = true;
+                            }
+                        } else {
+                            const input = document.getElementById(`q${index}_input`);
+                            if (input.value.toLowerCase() == q.correct.toString().toLowerCase()) {
+                                isCorrect = true;
+                            }
+                        }
+                        
+                        const message = isCorrect 
+                            ? `<i class="fas fa-check-circle mr-2"></i><strong>נכון!</strong><br>${q.explanation}`
+                            : `<i class="fas fa-times-circle mr-2"></i><strong>לא מדויק.</strong><br>${q.explanation}`;
+                        
+                        showFeedback(`feedback-q${index}`, message, isCorrect);
+                    });
+                });
+            };
+            
+            // --- Call Initialization Functions ---
+            setupChiSquareGOF();
+            setupChiSquareInd();
+            setupWilcoxonQuiz();
+            setupPracticeQuiz();
+            renderAllMath();
+        });
+    </script>
+</body>
+</html>
