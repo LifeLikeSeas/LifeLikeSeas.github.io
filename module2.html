@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סטטיסטי-כיפאק - מודול 2: עולם ההתפלגויות</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUbKyJjd8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Assistant', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #111827;
+            color: #d1d5db;
+        }
+        .katex { font-size: 1.1em; }
+        .feedback {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 1rem;
+        }
+        .feedback.show {
+             max-height: 500px;
+             opacity: 1;
+             margin-top: 1rem;
+             padding: 0.75rem 1rem;
+        }
+        .feedback.correct {
+            border-right: 4px solid #22c55e;
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+        .feedback.incorrect {
+            border-right: 4px solid #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        .pro-tip {
+            background-color: rgba(250, 204, 21, 0.1);
+            border-right: 4px solid #facc15;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        .pro-tip::before {
+            content: "💡 טיפ של אלופים";
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #facc15;
+        }
+        .practice-question {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-teal-300">
+                <i class="fas fa-bell mr-2"></i>מודול 2: עולם ההתפלגויות
+            </h1>
+            <a href="#" class="text-gray-300 hover:text-teal-300 transition">
+                <i class="fas fa-home ml-1"></i> חזרה לתפריט הראשי
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-teal-300 to-cyan-400">מהתאוריה לפרקטיקה</h2>
+            <p class="text-lg text-gray-400">נכיר את ההתפלגויות המרכזיות שיאפשרו לנו להבין את הנתונים ולקשר בין המדגם לאוכלוסייה.</p>
+        </section>
+
+        <!-- Section 2.1: Normal Distribution -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">2.1: ההתפלגות הנורמלית (פעמון גאוס)</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">ההתפלגות הנורמלית, `X \sim N(\mu, \sigma^2)`, היא אולי ההתפלגות החשובה והנפוצה ביותר בסטטיסטיקה. תכונותיה המרכזיות הן צורת הפעמון הסימטרית, והעובדה שהממוצע, החציון והשכיח שלה נמצאים באותה נקודה. הבנת השפעת הפרמטרים `\mu` (תוחלת) ו-`\sigma` (סטיית תקן) על צורתה היא המפתח לשימוש נכון בה.</p>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: מחשבון התפלגות נורמלית</h5>
+                    <p class="mb-4">הכלי הזה יעזור לך לחשב הסתברויות ולראות אותן בצורה ויזואלית. נסה את הדוגמה מהתרגול: `\mu=30`, `\sigma=2`, ומצא את ההסתברות שהטמפרטורה נמוכה מ-33.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label for="nd-mu">תוחלת (`\mu`)</label><input id="nd-mu" type="number" value="30" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label for="nd-sigma">סטיית תקן (`\sigma`)</label><input id="nd-sigma" type="number" value="2" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label for="nd-type">סוג חישוב</label>
+                            <select id="nd-type" class="w-full bg-gray-700 rounded p-2 mt-1">
+                                <option value="less">`P(X < a)`</option>
+                                <option value="greater">`P(X > a)`</option>
+                                <option value="between">`P(a < X < b)`</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="nd-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div><label for="nd-a">ערך a</label><input id="nd-a" type="number" value="33" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div id="nd-b-container" class="hidden"><label for="nd-b">ערך b</label><input id="nd-b" type="number" value="35" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                    </div>
+                    <button id="nd-calc-btn" class="mt-4 w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded transition">חשב ושרטט</button>
+                    <div class="w-full h-64 mt-4"><canvas id="normalDistChart"></canvas></div>
+                    <div id="feedback-nd" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2.2: Binomial Distribution -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">2.2: ההתפלגות הבינומית</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">התפלגות בינומית, `X \sim B(n, p)`, מתארת את מספר ההצלחות (`x`) בסדרה של `n` ניסויי ברנולי בלתי תלויים. ניסוי ברנולי הוא ניסוי עם שתי תוצאות אפשריות בלבד ("הצלחה" ו"כישלון"), וההסתברות להצלחה, `p`, קבועה בכל ניסוי.</p>
+                <div class="pro-tip">
+                    התוחלת (הערך המצופה) בהתפלגות בינומית היא `E(x) = np`, והשונות היא `V(x) = npq`, כאשר `q = 1-p`.
+                </div>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: מחשבון בינומי</h5>
+                    <p>מה ההסתברות לקבל בדיוק 7 "עץ" ב-10 הטלות של מטבע הוגן?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div><label>מספר ניסויים (`n`)</label><input id="binom-n" type="number" value="10" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label>הסתברות להצלחה (`p`)</label><input id="binom-p" type="number" step="0.01" value="0.5" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                        <div><label>מספר הצלחות (`x`)</label><input id="binom-x" type="number" value="7" class="w-full bg-gray-700 rounded p-2 mt-1"></div>
+                    </div>
+                    <button id="binom-calc-btn" class="mt-4 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded transition">חשב הסתברות</button>
+                    <div id="feedback-binom" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2.3: Z-scores -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">2.3: ציוני תקן (Z-scores)</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">ציון Z מתקנן ערכים מהתפלגויות נורמליות שונות ומאפשר להשוות ביניהם. הוא מודד בכמה סטיות תקן ערך מסוים רחוק מהממוצע. הנוסחה להתפלגות הדגימה של הממוצע היא: `Z = \frac{\bar{x} - \mu}{\sigma / \sqrt{n}}`.</p>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: מצא את השטח!</h5>
+                    <p class="mb-4">תרחיש: ציוני IQ מתפלגים נורמלית עם `\mu=100` ו-`\sigma=15`. דגמנו `n=25` אנשים ומצאנו `\bar{x}=106`. מה ההסתברות לקבל ממוצע מדגם כזה או גבוה יותר?</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label>שלב א': חישוב טעות התקן (`\sigma_{\bar{x}}`). הזן את הערכים:</label>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span>`\sigma_{\bar{x}} =`</span>
+                                <div class="inline-flex flex-col items-center justify-center mx-2 leading-tight">
+                                    <input id="z-se-sigma" type="number" class="w-16 bg-gray-700 rounded p-1 text-center" placeholder="σ">
+                                    <hr class="w-full border-gray-400 my-1">
+                                    <div class="flex items-center">
+                                        <span>√</span>
+                                        <input id="z-se-n" type="number" class="w-16 bg-gray-700 rounded p-1 text-center" placeholder="n">
+                                    </div>
+                                </div>
+                                <button id="z-se-calc" class="bg-teal-600 hover:bg-teal-700 px-3 py-1 rounded">חשב</button>
+                                <span id="z-se-result" class="font-bold"></span>
+                            </div>
+                        </div>
+                        <div id="z-score-calc-step" class="hidden">
+                            <label>שלב ב': חישוב ציון Z. הזן את הערכים:</label>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span>`Z =`</span>
+                                <div class="inline-flex flex-col items-center justify-center mx-2 leading-tight">
+                                    <div class="flex items-center">
+                                        <input id="z-xbar" type="number" class="w-16 bg-gray-700 rounded p-1 text-center" placeholder="x̄">
+                                        <span class="mx-2">-</span>
+                                        <input id="z-mu" type="number" class="w-16 bg-gray-700 rounded p-1 text-center" placeholder="μ">
+                                    </div>
+                                    <hr class="w-full border-gray-400">
+                                    <span id="z-se-value-display" class="px-2 py-1"></span>
+                                </div>
+                                <button id="z-calc" class="bg-teal-600 hover:bg-teal-700 px-3 py-1 rounded">חשב</button>
+                                <span id="z-result" class="font-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="feedback-z" class="mt-4 p-3 rounded-lg feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2.4: Central Limit Theorem -->
+        <section class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">2.4: משפט הגבול המרכזי (CLT)</h3>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="mb-4">זהו אחד המשפטים החשובים בסטטיסטיקה! הוא קובע שהתפלגות הדגימה של הממוצע (`\bar{x}`) תהיה בקירוב נורמלית, ללא תלות בצורת התפלגות האוכלוסייה המקורית, כל עוד גודל המדגם (`n`) גדול מספיק (בדרך כלל `n > 30`). זה מאפשר לנו להשתמש במבחנים נורמליים גם כשאנחנו לא יודעים כלום על האוכלוסייה!</p>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                    <h5 class="font-bold mb-4 text-xl">פעילות: ה-CLT בפעולה</h5>
+                    <p>נניח שאוכלוסיית ציוני שביעות רצון (1-5) מתפלגת באופן אחיד (לא נורמלי). בוא נראה מה קורה לממוצעים כשניקח הרבה מדגמים.</p>
+                    <div class="w-full h-64 mb-4"><canvas id="cltChart"></canvas></div>
+                    <button id="clt-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded transition">דגום 1000 מדגמים (n=40) ושרטט</button>
+                    <p class="mt-4 text-gray-400 text-sm">לחץ על הכפתור. למרות שהאוכלוסייה המקורית לא נורמלית, תראה שההיסטוגרמה של ממוצעי המדגמים יוצרת צורת פעמון יפהפייה!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2.5: Practice Questions -->
+        <section id="practice" class="mb-12">
+            <h3 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">2.5: תרגול מסכם</h3>
+            <div id="practice-questions-container"></div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const renderAllMath = () => {
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '`', right: '`', display: false},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ]
+                    });
+                }
+            };
+            
+            const showFeedback = (elementId, message, isCorrect) => {
+                const feedbackEl = document.getElementById(elementId);
+                if (!feedbackEl) return;
+                feedbackEl.innerHTML = message;
+                feedbackEl.className = `p-3 rounded-lg feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+                renderAllMath();
+            };
+            
+            const setupNormalDistributionCalculator = () => {
+                const ctx = document.getElementById('normalDistChart')?.getContext('2d');
+                if (!ctx) return;
+                let chart;
+
+                const typeSelect = document.getElementById('nd-type');
+                const bContainer = document.getElementById('nd-b-container');
+                typeSelect.addEventListener('change', () => {
+                    bContainer.classList.toggle('hidden', typeSelect.value !== 'between');
+                });
+
+                const erf = (x) => {
+                    const a1 =  0.254829592;
+                    const a2 = -0.284496736;
+                    const a3 =  1.421413741;
+                    const a4 = -1.453152027;
+                    const a5 =  1.061405429;
+                    const p  =  0.3275911;
+                    const sign = x < 0 ? -1 : 1;
+                    x = Math.abs(x);
+                    const t = 1.0 / (1.0 + p * x);
+                    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+                    return sign * y;
+                };
+
+                const cdf = (x, mu, sigma) => 0.5 * (1 + erf((x - mu) / (sigma * Math.sqrt(2))));
+
+                const pdf = (x, mu, sigma) => Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2)) / (sigma * Math.sqrt(2 * Math.PI));
+
+                const updateChart = (mu, sigma, type, valA, valB) => {
+                    const labels = [];
+                    const data = [];
+                    const backgroundColors = [];
+                    const start = mu - 4 * sigma;
+                    const end = mu + 4 * sigma;
+                    const step = (end - start) / 200;
+
+                    for (let i = start; i <= end; i += step) {
+                        labels.push(i.toFixed(2));
+                        data.push(pdf(i, mu, sigma));
+                        let color = 'rgba(20, 184, 166, 0.1)';
+                        if (type === 'less' && i <= valA) color = 'rgba(20, 184, 166, 0.6)';
+                        if (type === 'greater' && i >= valA) color = 'rgba(20, 184, 166, 0.6)';
+                        if (type === 'between' && i >= valA && i <= valB) color = 'rgba(20, 184, 166, 0.6)';
+                        backgroundColors.push(color);
+                    }
+
+                    if (chart) chart.destroy();
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: backgroundColors,
+                                borderColor: 'rgba(13, 148, 136, 1)',
+                                borderWidth: 1,
+                                barPercentage: 1.0,
+                                categoryPercentage: 1.0
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#9ca3af', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { beginAtZero: true, ticks: { color: '#9ca3af' } } }, plugins: { legend: { display: false } } }
+                    });
+                };
+
+                document.getElementById('nd-calc-btn').addEventListener('click', () => {
+                    const mu = parseFloat(document.getElementById('nd-mu').value);
+                    const sigma = parseFloat(document.getElementById('nd-sigma').value);
+                    const type = document.getElementById('nd-type').value;
+                    const valA = parseFloat(document.getElementById('nd-a').value);
+                    const valB = parseFloat(document.getElementById('nd-b').value);
+
+                    if (isNaN(mu) || isNaN(sigma) || isNaN(valA) || (type === 'between' && isNaN(valB))) {
+                        showFeedback('feedback-nd', 'נא למלא את כל השדות הרלוונטיים.', false);
+                        return;
+                    }
+                    
+                    let prob = 0;
+                    let z = 0;
+                    let explanation = '';
+
+                    if (type === 'less') {
+                        prob = cdf(valA, mu, sigma);
+                        z = (valA - mu) / sigma;
+                        explanation = `ציון התקן הוא \`Z = (${valA} - ${mu}) / ${sigma} = ${z.toFixed(2)}\`.<br>ההסתברות למצוא ערך נמוך מ-${valA} היא \`P(X < ${valA}) = ${prob.toFixed(4)}\`.`;
+                    } else if (type === 'greater') {
+                        prob = 1 - cdf(valA, mu, sigma);
+                        z = (valA - mu) / sigma;
+                        explanation = `ציון התקן הוא \`Z = (${valA} - ${mu}) / ${sigma} = ${z.toFixed(2)}\`.<br>ההסתברות למצוא ערך גבוה מ-${valA} היא \`P(X > ${valA}) = ${prob.toFixed(4)}\`.`;
+                    } else if (type === 'between') {
+                        prob = cdf(valB, mu, sigma) - cdf(valA, mu, sigma);
+                        const zA = (valA - mu) / sigma;
+                        const zB = (valB - mu) / sigma;
+                        explanation = `ציוני התקן הם \`Z_a = ${zA.toFixed(2)}\` ו-\`Z_b = ${zB.toFixed(2)}\`.<br>ההסתברות למצוא ערך בין ${valA} ל-${valB} היא \`P(${valA} < X < ${valB}) = ${prob.toFixed(4)}\`.`;
+                    }
+                    
+                    showFeedback('feedback-nd', explanation, true);
+                    updateChart(mu, sigma, type, valA, valB);
+                });
+            };
+            
+            const setupBinomialCalculator = () => {
+                const factorial = (num) => {
+                    if (num < 0) return -1;
+                    if (num === 0) return 1;
+                    let result = 1;
+                    for(let i = 2; i <= num; i++) result *= i;
+                    return result;
+                };
+                const combinations = (n, k) => {
+                    if (k < 0 || k > n) return 0;
+                    return factorial(n) / (factorial(k) * factorial(n - k));
+                };
+
+                document.getElementById('binom-calc-btn')?.addEventListener('click', () => {
+                    const n = parseInt(document.getElementById('binom-n').value);
+                    const p = parseFloat(document.getElementById('binom-p').value);
+                    const x = parseInt(document.getElementById('binom-x').value);
+                    if (isNaN(n) || isNaN(p) || isNaN(x) || p < 0 || p > 1 || x < 0 || x > n) {
+                        showFeedback('feedback-binom', 'ערכים לא חוקיים.', false);
+                        return;
+                    }
+                    const prob = combinations(n, x) * Math.pow(p, x) * Math.pow(1 - p, n - x);
+                    const message = `ההסתברות היא: ` + '`P(X=' + x + ') = \\binom{' + n + '}{' + x + '}(' + p + ')^{' + x + '}(1-' + p + ')^{' + (n-x) + '} = ' + prob.toFixed(4) + '`';
+                    showFeedback('feedback-binom', message, true);
+                });
+            };
+
+            const setupZScoreCalculator = () => {
+                document.getElementById('z-se-calc')?.addEventListener('click', () => {
+                    const sigma = parseFloat(document.getElementById('z-se-sigma').value);
+                    const n = parseFloat(document.getElementById('z-se-n').value);
+                    if (sigma === 15 && n === 25) {
+                        const se = sigma / Math.sqrt(n);
+                        document.getElementById('z-se-result').textContent = `= ${se}`;
+                        document.getElementById('z-se-value-display').textContent = se;
+                        document.getElementById('z-score-calc-step').classList.remove('hidden');
+                    } else {
+                        alert('ערכים לא נכונים. נסה עם הנתונים מהתרחיש: σ=15, n=25.');
+                    }
+                });
+
+                document.getElementById('z-calc')?.addEventListener('click', () => {
+                    const xbar = parseFloat(document.getElementById('z-xbar').value);
+                    const mu = parseFloat(document.getElementById('z-mu').value);
+                    if (xbar === 106 && mu === 100) {
+                        const se = 3;
+                        const z = (xbar - mu) / se;
+                        document.getElementById('z-result').textContent = `= ${z}`;
+                        const pValue = 1 - 0.9772;
+                        showFeedback('feedback-z', `מעולה! ציון ה-Z הוא ${z}. ההסתברות לקבל ממוצע כזה או גבוה יותר היא ` + pValue.toFixed(4) + ` או ` + (pValue*100).toFixed(2) + `%`, true);
+                    } else {
+                        alert('ערכים לא נכונים. נסה עם הנתונים מהתרחיש: x̄=106, μ=100.');
+                    }
+                });
+            };
+
+            const setupCLTChart = () => {
+                const ctx = document.getElementById('cltChart')?.getContext('2d');
+                if (!ctx) return;
+                let chart;
+
+                document.getElementById('clt-btn').addEventListener('click', () => {
+                    const sampleSize = 40;
+                    const numSamples = 1000;
+                    const population = [1, 2, 3, 4, 5];
+                    const sampleMeans = [];
+                    for (let i = 0; i < numSamples; i++) {
+                        let currentSampleSum = 0;
+                        for (let j = 0; j < sampleSize; j++) {
+                            currentSampleSum += population[Math.floor(Math.random() * population.length)];
+                        }
+                        sampleMeans.push(currentSampleSum / sampleSize);
+                    }
+                    const bins = {};
+                    sampleMeans.forEach(mean => {
+                        const bin = Math.round(mean * 10) / 10;
+                        bins[bin] = (bins[bin] || 0) + 1;
+                    });
+                    const labels = Object.keys(bins).sort((a, b) => a - b);
+                    const data = labels.map(label => bins[label]);
+                    if (chart) chart.destroy();
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'התפלגות ממוצעי המדגמים',
+                                data: data,
+                                backgroundColor: 'rgba(20, 184, 166, 0.6)',
+                                borderColor: 'rgba(13, 148, 136, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { x: { title: { display: true, text: 'ממוצע המדגם', color: '#9ca3af' }, ticks: { color: '#9ca3af' } }, y: { title: { display: true, text: 'שכיחות', color: '#9ca3af' }, beginAtZero: true, ticks: { color: '#9ca3af' } } }, plugins: { legend: { display: false } } }
+                    });
+                });
+            };
+            
+            const setupPracticeQuiz = () => {
+                const container = document.getElementById('practice-questions-container');
+                const questions = [
+                    {
+                        type: 'radio',
+                        question: "ציונים במבחן ארצי מתפלגים נורמלית עם `\\mu=78, \\sigma=8`. מה ההסתברות שתלמיד שנבחר באקראי קיבל ציון גבוה מ-86?",
+                        options: ["15.87%", "2.28%", "84.13%", "5%"],
+                        correct: 0,
+                        explanation: "שלב א: חישוב ציון Z: `Z = (86 - 78) / 8 = 1`.<br>שלב ב: מציאת השטח בטבלת Z. `P(Z > 1) = 1 - P(Z < 1) = 1 - 0.8413 = 0.1587`. כלומר, 15.87%."
+                    },
+                    {
+                        type: 'radio',
+                        question: "בסקר, 30% מהאוכלוסייה תומכים במועמד א'. אם נדגום 10 אנשים, מה הסיכוי שבדיוק 3 יתמכו בו?",
+                        options: ["0.3000", "0.9000", "0.2668", "0.0916"],
+                        correct: 2,
+                        explanation: "זוהי התפלגות בינומית עם `n=10, p=0.3, x=3`. הנוסחה היא `P(X=3) = \\binom{10}{3}(0.3)^3(0.7)^7`. החישוב נותן 0.2668."
+                    },
+                    {
+                        type: 'radio',
+                        question: "מתי נשתמש בקירוב הנורמלי להתפלגות הבינומית?",
+                        options: [
+                            "תמיד כש-`n > 30`",
+                            "רק כשההתפלגות סימטרית (`p=0.5`)",
+                            "כאשר `np \\ge 10` וגם `nq \\ge 10`",
+                            "כאשר `n` קטן ו-`p` קרוב ל-0"
+                        ],
+                        correct: 2,
+                        explanation: "כלל האצבע לשימוש בקירוב הנורמלי הוא שמספר ההצלחות הצפוי ומספר הכישלונות הצפוי יהיו שניהם גדולים או שווים ל-10. זה מבטיח שהתפלגות הפעמון תהיה קירוב טוב."
+                    },
+                    {
+                        type: 'text',
+                        question: "משקל תפוחים מתפלג באופן לא ידוע עם `\\mu=150` גרם ו-`\\sigma=20` גרם. מהי סטיית התקן של התפלגות הדגימה של הממוצע (`\\sigma_{\\bar{x}}`) עבור מדגם בגודל `n=100`?",
+                        correct: 2,
+                        explanation: "לפי משפט הגבול המרכזי, גם אם התפלגות האוכלוסייה לא ידועה, התפלגות הדגימה של הממוצע תהיה נורמלית. טעות התקן היא `\\sigma_{\\bar{x}} = \\sigma / \\sqrt{n} = 20 / \\sqrt{100} = 20 / 10 = 2`."
+                    },
+                    {
+                        type: 'radio',
+                        question: "איזה מהבאים מתאר בצורה הטובה ביותר את משפט הגבול המרכזי (CLT)?",
+                        options: [
+                            "כל מדגם גדול מ-30 מתפלג נורמלית.",
+                            "התפלגות הדגימה של הממוצע מתקרבת לנורמלית ככל שגודל המדגם עולה.",
+                            "אם האוכלוסייה נורמלית, גם המדגם נורמלי.",
+                            "השונות של המדגם שווה לשונות האוכלוסייה חלקי n."
+                        ],
+                        correct: 1,
+                        explanation: "זוהי בדיוק מהות המשפט. הוא עוסק בהתפלגות של **ממוצעי המדגמים** (`\\bar{x}`), לא בנתוני המדגם הבודדים עצמם."
+                    },
+                    {
+                        type: 'radio',
+                        question: "במפעל, 5% מהמוצרים פגומים. מה ההסתברות שבמדגם של 400 מוצרים, יהיו 30 פגומים או יותר? (השתמש בקירוב נורמלי עם תיקון רציפות)",
+                        options: ["`P(Z > 2.44)`", "`P(Z > 2.18)`", "`P(Z > 2.5)`", "`P(Z < -2.18)`"],
+                        correct: 1,
+                        explanation: "שלב א: בדיקת תנאים: `np = 400*0.05 = 20 \\ge 10`, `nq = 400*0.95 = 380 \\ge 10`. התנאים מתקיימים.<br>שלב ב: חישוב תוחלת וסטיית תקן: `\\mu = np = 20`, `\\sigma = \\sqrt{npq} = \\sqrt{19} \\approx 4.359`.<br>שלב ג: תיקון רציפות: `P(X \\ge 30)` הופך ל-`P(X > 29.5)`.<br>שלב ד: ציון תקן: `Z = (29.5 - 20) / 4.359 \\approx 2.18`."
+                    }
+                ];
+
+                questions.forEach((q, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'practice-question';
+                    let optionsHtml = '';
+                    if (q.type === 'radio') {
+                        let radioButtonsHtml = '';
+                        q.options.forEach((opt, i) => {
+                            const optionId = `q${index}_opt${i}`;
+                            const radioInput = `<input type="radio" id="${optionId}" name="q${index}" value="${i}">`;
+                            const label = `<label for="${optionId}" class="ml-2">${opt}</label>`;
+                            radioButtonsHtml += `<div>${radioInput}${label}</div>`;
+                        });
+                        optionsHtml = `<div class="space-y-2 mt-4">${radioButtonsHtml}</div>`;
+                    } else {
+                        optionsHtml = `<input type="number" id="q${index}_input" class="mt-4 w-full bg-gray-700 rounded p-2" placeholder="הקלד את תשובתך כאן">`;
+                    }
+
+                    qDiv.innerHTML = `
+                        <p class="font-bold text-lg">שאלה ${index + 1}:</p>
+                        <p class="mt-2">${q.question}</p>
+                        ${optionsHtml}
+                        <button class="check-answer-btn mt-4 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded" data-index="${index}">בדוק תשובה</button>
+                        <div id="feedback-q${index}" class="mt-4 p-3 rounded-lg feedback"></div>
+                    `;
+                    container.appendChild(qDiv);
+                });
+
+                document.querySelectorAll('.check-answer-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        const index = parseInt(e.target.dataset.index, 10);
+                        const q = questions[index];
+                        let isCorrect = false;
+                        if (q.type === 'radio') {
+                            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                            if (selected && parseInt(selected.value, 10) === q.correct) {
+                                isCorrect = true;
+                            }
+                        } else {
+                            const input = document.getElementById(`q${index}_input`);
+                            if (Math.abs(parseFloat(input.value) - q.correct) < 0.01) {
+                                isCorrect = true;
+                            }
+                        }
+                        
+                        const message = isCorrect 
+                            ? `<i class="fas fa-check-circle mr-2"></i><strong>נכון!</strong><br>${q.explanation}`
+                            : `<i class="fas fa-times-circle mr-2"></i><strong>לא מדויק.</strong><br>${q.explanation}`;
+                        
+                        showFeedback(`feedback-q${index}`, message, isCorrect);
+                    });
+                });
+            };
+            
+            // --- Call Initialization Functions ---
+            setupNormalDistributionCalculator();
+            setupBinomialCalculator();
+            setupZScoreCalculator();
+            setupCLTChart();
+            setupPracticeQuiz();
+            renderAllMath();
+        });
+    </script>
+</body>
+</html>
